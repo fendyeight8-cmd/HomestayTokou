@@ -1324,7 +1324,7 @@ const App = {
       <div id="qr-payment-view" class="qr-container">
         <h3 style="font-family:'Playfair Display', serif; margin-bottom:0.5rem;">Secure Payment</h3>
         <p class="payment-instruction">Please scan the QR code below to make your payment of <strong>${CONFIG.CURRENCY} ${total.toFixed(2)}</strong>.</p>
-        <img src="/images/qr-placeholder.png" alt="Payment QR Code" class="qr-image" onerror="this.src='https://placehold.co/200x200?text=Scan+to+Pay'">
+        <img src="/images/QR.png" alt="Payment QR Code" class="qr-image" onerror="this.src='https://placehold.co/200x200?text=Scan+to+Pay'">
         <p class="payment-instruction" style="font-size:0.75rem;">Once payment is complete, click the button below to notify the owner via WhatsApp.</p>
         <button class="btn-primary btn-block" onclick="App.submitBooking('${ci}', '${co}', 'qr_paid')">I Have Made Payment</button>
         <button class="btn-outline btn-block mt-1" onclick="App.showFormView()" style="border:none;">Go Back</button>
