@@ -165,13 +165,24 @@
   .btn-primary:hover { background: #3b573e; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(78, 110, 82, 0.4); }
 
   .btn-outline {
-    border: 1.5px solid rgba(244, 241, 234, 0.7); color: var(--cream);
+    border: 1.5px solid var(--mid-brown); color: var(--mid-brown);
     padding: .9rem 2.4rem; font-weight: 500; font-size: 1rem;
     border-radius: 8px; cursor: pointer; background: transparent;
     text-decoration: none; display: inline-block;
-    transition: border-color .3s, background .3s, transform .2s;
+    transition: all .3s;
   }
-  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+  .btn-outline:hover { border-color: var(--sage); color: var(--sage); background: rgba(78,110,82,0.05); transform: translateY(-2px); }
+
+  /* Hero-specific outline button for dark background */
+  .hero .btn-outline {
+    border-color: rgba(244, 241, 234, 0.7);
+    color: var(--cream);
+  }
+  .hero .btn-outline:hover {
+    border-color: white;
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
 
   .hero-scroll {
     position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
@@ -1315,10 +1326,10 @@ const App = {
         </div>
         
         <div class="booking-options">
-          <button class="btn-outline" onclick="App.submitBooking('${ci}', '${co}', 'whatsapp')" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 1: Chat with Owner</button>
+          <button class="btn-outline" onclick="App.submitBooking('${ci}', '${co}', 'whatsapp')" style="font-size:0.85rem; padding: 0.8rem 0.5rem; border-color: var(--sage); color: var(--sage);">Option 1: Chat with Owner</button>
           <button class="btn-primary" onclick="App.showQRView('${ci}', '${co}')" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 2: Pay & Book</button>
         </div>
-        <button id="shareBtn" class="btn-outline btn-block mt-1" style="border:none; color:var(--mid-brown); font-size:0.8rem;" onclick="App.shareBooking('${ci}', '${co}')">Share this stay</button>
+        <button id="shareBtn" class="btn-outline btn-block mt-1" style="border:none; color:var(--mid-brown); font-size:0.8rem; background:none;" onclick="App.shareBooking('${ci}', '${co}')">Share this stay</button>
       </div>
 
       <div id="qr-payment-view" class="qr-container">
