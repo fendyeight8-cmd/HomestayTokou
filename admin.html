@@ -1,428 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Homestay Tokou</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0F1117;
-    --surface: #1A1D27;
-    --surface2: #22253A;
-    --border: rgba(255,255,255,.08);
-    --gold: #D4A853;
-    --gold-dim: rgba(212,168,83,.15);
-    --cream: #F5EFE0;
-    --text: #E8E4DC;
-    --text-dim: rgba(232,228,220,.5);
-    --green: #4CAF7D;
-    --red: #E05252;
-    --blue: #5B8EE0;
-    --shadow: rgba(0,0,0,.4);
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestay Tokou — Management Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #F4F1EA;
+            --warm-white: #FCFBF8;
+            --deep-brown: #3E2723;
+            --mid-brown: #5D4037;
+            --gold: #D49A3E;
+            --sage: #4E6E52;
+            --border: rgba(62, 39, 35, 0.1);
+        }
 
-  /* ── LAYOUT ── */
-  .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--deep-brown);
+            min-height: 100vh;
+        }
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 2rem 0;
-    position: sticky; top: 0; height: 100vh;
-    display: flex; flex-direction: column;
-  }
-  .sidebar-logo {
-    padding: 0 1.5rem 2rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1.5rem;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem; color: var(--cream);
-  }
-  .sidebar-logo span { color: var(--gold); }
-  .sidebar-logo p { font-size: .75rem; color: var(--text-dim); font-family: 'Outfit', sans-serif; font-weight: 400; margin-top: .2rem; }
+        /* ── UTILS ── */
+        .btn-primary { background: var(--sage); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-primary:hover { background: var(--deep-brown); }
+        .btn-gold { background: var(--gold); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
 
-  .sidebar-nav { list-style: none; padding: 0 .75rem; flex: 1; }
-  .sidebar-nav li { margin-bottom: .25rem; }
-  .sidebar-nav a {
-    display: flex; align-items: center; gap: .75rem;
-    padding: .65rem 1rem; border-radius: 4px;
-    color: var(--text-dim); text-decoration: none; font-size: .9rem;
-    transition: background .15s, color .15s;
-  }
-  .sidebar-nav a:hover, .sidebar-nav a.active {
-    background: var(--gold-dim); color: var(--gold);
-  }
-  .sidebar-nav .icon { font-size: 1.1rem; width: 20px; text-align: center; }
+        /* ── LOGIN OVERLAY ── */
+        #login-overlay {
+            position: fixed; inset: 0; background: var(--deep-brown); z-index: 1000;
+            display: flex; align-items: center; justify-content: center; padding: 2rem;
+        }
+        .login-card {
+            background: var(--cream); width: 100%; max-width: 400px; padding: 3rem;
+            border-radius: 16px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); text-align: center;
+        }
+        .login-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 2rem; }
 
-  .sidebar-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid var(--border);
-    font-size: .8rem; color: var(--text-dim);
-  }
-  .sidebar-footer a { color: var(--gold); text-decoration: none; }
+        /* ── ADMIN LAYOUT ── */
+        .admin-container { display: none; min-height: 100vh; }
+        .sidebar {
+            width: 280px; background: var(--deep-brown); color: var(--cream); padding: 2.5rem;
+            display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10;
+        }
+        .sidebar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 3rem; color: var(--cream); text-decoration: none; }
+        .sidebar-nav { list-style: none; flex-grow: 1; }
+        .sidebar-nav li { margin-bottom: 1.5rem; }
+        .sidebar-nav a { color: rgba(244, 241, 234, 0.6); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 1rem; cursor: pointer; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { color: var(--gold); }
 
-  /* ── MAIN ── */
-  .main { overflow-y: auto; }
+        .main-content { margin-left: 280px; padding: 4rem; }
 
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 1.2rem 2.5rem;
-    display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 10;
-  }
-  .topbar h1 { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
-  .topbar-meta { font-size: .82rem; color: var(--text-dim); }
+        /* ── SECTIONS ── */
+        .section-box { background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 3rem; display: none; }
+        .section-box.active { display: block; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .section-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; }
 
-  .content { padding: 2.5rem; }
+        /* ── DASHBOARD STATS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: var(--warm-white); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
+        .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); margin-bottom: 0.5rem; display: block; }
+        .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; }
 
-  /* ── STATS ── */
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem; margin-bottom: 2.5rem;
-  }
-  .stat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; padding: 1.5rem;
-    position: relative; overflow: hidden;
-  }
-  .stat-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: var(--gold);
-  }
-  .stat-label {
-    font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-dim); margin-bottom: .6rem;
-  }
-  .stat-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem; color: var(--cream); line-height: 1;
-    margin-bottom: .2rem;
-  }
-  .stat-sub { font-size: .8rem; color: var(--text-dim); }
-  .stat-icon { position: absolute; top: 1.2rem; right: 1.2rem; font-size: 1.8rem; opacity: .25; }
+        /* ── TABLES ── */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1.2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); border-bottom: 2px solid var(--cream); }
+        td { padding: 1.2rem; border-bottom: 1px solid var(--cream); font-size: 0.9rem; }
+        .edit-input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; }
+        .room-thumb { width: 60px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
 
-  /* ── TABLES ── */
-  .section-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; overflow: hidden; margin-bottom: 2rem;
-  }
-  .section-card-header {
-    padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .section-card-header h2 {
-    font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--cream);
-  }
-  .section-card-header p { font-size: .8rem; color: var(--text-dim); }
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(62, 39, 35, 0.8); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;
+        }
+        .modal-content {
+            background: var(--cream); width: 100%; max-width: 600px; border-radius: 20px;
+            padding: 3rem; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+        }
+        .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--mid-brown); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 0.8rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; background: white; font-family: inherit;
+        }
 
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    padding: .8rem 1.5rem;
-    text-align: left; font-size: .7rem; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface2);
-  }
-  td {
-    padding: .9rem 1.5rem; font-size: .88rem;
-    border-bottom: 1px solid var(--border); color: var(--text);
-    vertical-align: middle;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,.02); }
-
-  .badge {
-    display: inline-block; padding: .2rem .65rem; border-radius: 20px;
-    font-size: .72rem; font-weight: 600; letter-spacing: .5px;
-  }
-  .badge-confirmed { background: rgba(76,175,125,.15); color: var(--green); }
-  .badge-cancelled { background: rgba(224,82,82,.15); color: var(--red); }
-  .badge-pending   { background: rgba(91,142,224,.15); color: var(--blue); }
-
-  .action-btn {
-    background: none; border: 1px solid var(--border);
-    color: var(--text-dim); padding: .3rem .7rem; border-radius: 3px;
-    cursor: pointer; font-size: .78rem; font-family: 'Outfit', sans-serif;
-    transition: all .15s; margin-right: .3rem;
-  }
-  .action-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .action-btn.danger:hover { border-color: var(--red); color: var(--red); }
-
-  /* ── SEARCH BAR ── */
-  .search-bar {
-    display: flex; gap: .75rem; margin-bottom: 1.5rem;
-  }
-  .search-bar input {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); padding: .65rem 1rem; border-radius: 4px;
-    font-family: 'Outfit', sans-serif; font-size: .9rem; outline: none;
-    transition: border-color .2s;
-  }
-  .search-bar input:focus { border-color: var(--gold); }
-  .search-bar select {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); padding: .65rem 1rem; border-radius: 4px;
-    font-family: 'Outfit', sans-serif; font-size: .9rem; outline: none;
-  }
-
-  /* ── EMPTY ── */
-  .empty { text-align: center; padding: 3rem; color: var(--text-dim); font-size: .9rem; }
-
-  /* ── SPINNER ── */
-  .spinner {
-    width: 36px; height: 36px; border-radius: 50%;
-    border: 3px solid var(--border); border-top-color: var(--gold);
-    animation: spin .8s linear infinite; margin: 2rem auto;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; bottom: 1.5rem; right: 1.5rem;
-    background: var(--surface2); color: var(--text);
-    padding: .9rem 1.3rem; border-radius: 4px; z-index: 999;
-    border-left: 3px solid var(--gold); font-size: .88rem;
-    box-shadow: 0 8px 30px var(--shadow);
-    transform: translateY(100px); opacity: 0;
-    transition: transform .3s, opacity .3s; max-width: 320px;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.error { border-color: var(--red); }
-  .toast.success { border-color: var(--green); }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
-    display: none; place-items: center;
-  }
-  .modal-overlay.open { display: grid; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; width: 100%; max-width: 480px;
-    padding: 2rem; animation: mIn .2s ease;
-  }
-  @keyframes mIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
-  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--cream); }
-  .modal .detail-row { display: flex; justify-content: space-between; padding: .5rem 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
-  .modal .detail-row:last-of-type { border-bottom: none; }
-  .modal .key { color: var(--text-dim); }
-  .modal-btns { display: flex; gap: .75rem; margin-top: 1.5rem; justify-content: flex-end; }
-  .btn { padding: .65rem 1.3rem; border-radius: 3px; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: .88rem; font-weight: 500; border: none; transition: opacity .15s; }
-  .btn-gold { background: var(--gold); color: #1a1000; }
-  .btn-red  { background: rgba(224,82,82,.15); color: var(--red); border: 1px solid rgba(224,82,82,.3); }
-  .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text-dim); }
-  .btn:hover { opacity: .85; }
-
-  @media (max-width: 900px) {
-    .admin-layout { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-</style>
+        .qr-preview { width: 150px; height: 150px; border: 1px solid var(--border); margin-top: 1rem; object-fit: contain; background: white; }
+    </style>
 </head>
 <body>
-
-<div class="admin-layout">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      Tokou<span>.</span>
-      <p>Admin Dashboard</p>
-    </div>
-    <ul class="sidebar-nav">
-      <li><a href="#" class="active" onclick="showSection('overview')"><span class="icon">📊</span> Overview</a></li>
-      <li><a href="#" onclick="showSection('rooms')"><span class="icon">🏡</span> Rooms</a></li>
-      <li><a href="#" onclick="showSection('reviews')"><span class="icon">⭐</span> Reviews</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="/">← Back to Website</a><br>
-      <span style="margin-top:.5rem;display:block">Homestay Tokou © 2025</span>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-    <div class="topbar">
-      <h1 id="page-title">Overview</h1>
-      <span class="topbar-meta" id="topbar-meta">Loading…</span>
+    <!-- LOGIN -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Tokou Management Login</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" style="width: 100%" onclick="Admin.login()">Enter Suite</button>
+            <p id="login-error" style="color: #c0392b; font-size: 0.8rem; margin-top: 1rem; display: none;">Invalid credentials. (Hint: admin / admin123)</p>
+        </div>
     </div>
 
-    <div class="content">
+    <!-- ADMIN PANEL -->
+    <div class="admin-container" id="admin-container">
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo">Homestay Tokou<span>.</span></a>
+            <ul class="sidebar-nav">
+                <li><a onclick="Admin.showSection('overview')" id="nav-overview" class="active">Business Overview</a></li>
+                <li><a onclick="Admin.showSection('inventory')" id="nav-inventory">Room Inventory</a></li>
+                <li><a onclick="Admin.showSection('reviews')" id="nav-reviews">Guest Reviews</a></li>
+                <li><a onclick="Admin.showSection('settings')" id="nav-settings">Site Settings</a></li>
+            </ul>
+            <ul class="sidebar-nav" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(244,241,234,0.1)">
+                <li><a onclick="Admin.logout()" style="color: #e74c3c">Safe Logout</a></li>
+                <li><a href="/" style="opacity: 0.5">View Website</a></li>
+            </ul>
+        </aside>
 
-      <!-- OVERVIEW -->
-      <div id="section-overview">
-        <div class="stats-grid" id="stats-grid">
-          <div style="grid-column:1/-1;text-align:center"><div class="spinner"></div></div>
+        <main class="main-content">
+            <!-- OVERVIEW -->
+            <section id="section-overview" class="section-box active">
+                <div class="section-header"><h2>Business Overview</h2></div>
+                <div class="stats-grid">
+                    <div class="stat-card"><span class="stat-label">Total Sales</span><div class="stat-value" id="stat-revenue">RM 0.00</div></div>
+                    <div class="stat-card"><span class="stat-label">Reservations</span><div class="stat-value" id="stat-bookings">0</div></div>
+                    <div class="stat-card"><span class="stat-label">Total Rooms</span><div class="stat-value" id="stat-rooms">0</div></div>
+                    <div class="stat-card"><span class="stat-label">Guest Rating</span><div class="stat-value" id="stat-rating">0.0</div></div>
+                </div>
+                <h3>Recent Activity</h3>
+                <table style="margin-top: 1.5rem">
+                    <thead><tr><th>Guest Name</th><th>Room</th><th>Stay Dates</th><th>Revenue</th><th>Status</th></tr></thead>
+                    <tbody id="recent-bookings-table"></tbody>
+                </table>
+            </section>
+
+            <!-- INVENTORY -->
+            <section id="section-inventory" class="section-box">
+                <div class="section-header">
+                    <h2>Room Inventory</h2>
+                    <button class="btn-primary" onclick="Admin.openAddRoomModal()">+ Add New Room</button>
+                </div>
+                <table>
+                    <thead><tr><th style="width: 80px">Photo</th><th>Room Name</th><th>Category</th><th>Price (RM)</th><th>Cap.</th><th style="text-align: right">Action</th></tr></thead>
+                    <tbody id="inventory-table"></tbody>
+                </table>
+            </section>
+
+            <!-- REVIEWS -->
+            <section id="section-reviews" class="section-box">
+                <div class="section-header"><h2>Guest Reviews</h2></div>
+                <table id="reviews-table"></table>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="section-settings" class="section-box">
+                <div class="section-header"><h2>Site Settings</h2></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Business WhatsApp</label>
+                        <input type="text" id="set-whatsapp" placeholder="+60123456789">
+                        <button class="btn-gold" style="margin-top: 1rem" onclick="Admin.saveSetting('whatsapp')">Save Number</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment QR Code</label>
+                        <div style="position: relative; overflow: hidden; display: inline-block;">
+                            <button class="btn-primary">Upload New QR</button>
+                            <input type="file" onchange="Admin.handleFileUpload('qr', 0, this)" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%">
+                        </div>
+                        <br><img id="qr-preview" class="qr-preview" src="">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ADD ROOM MODAL -->
+    <div class="modal-overlay" id="add-room-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="Admin.closeAddRoomModal()">✕</button>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem">Add New Luxury Suite</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>Room Name</label><input type="text" id="new-room-name" placeholder="E.g. Royal Suite"></div>
+                <div class="form-group"><label>Category</label><select id="new-room-type"><option>Standard</option><option>Deluxe</option><option>Suite</option><option>Family</option></select></div>
+                <div class="form-group"><label>Price per Night (RM)</label><input type="number" id="new-room-price" value="150"></div>
+                <div class="form-group"><label>Max Guests</label><input type="number" id="new-room-cap" value="2"></div>
+            </div>
+            <div class="form-group"><label>Suite Description</label><textarea id="new-room-desc" rows="3" placeholder="Briefly describe the unique features..."></textarea></div>
+            <button class="btn-primary" style="width: 100%; margin-top: 1rem" onclick="Admin.submitNewRoom()">Initialize Room & Add to Inventory</button>
         </div>
-      </div>
+    </div>
 
+    <script>
+        const Admin = {
+            token: localStorage.getItem('admin_token'),
 
+            init() {
+                if (window.location.protocol === 'file:') alert('Please use http://localhost:8080/admin');
+                if (this.token) {
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('admin-container').style.display = 'block';
+                    this.refreshAll();
+                }
+            },
 
-      <!-- ROOMS -->
-      <div id="section-rooms" style="display:none">
-        <div class="section-card">
-          <div class="section-card-header">
-            <div><h2>Room Inventory</h2><p>All available rooms</p></div>
-          </div>
-          <div id="rooms-table"></div>
-        </div>
-      </div>
+            async refreshAll() {
+                await Promise.all([this.loadDashboard(), this.loadRooms(), this.loadReviews(), this.loadSettings()]);
+            },
 
-      <!-- REVIEWS -->
-      <div id="section-reviews" style="display:none">
-        <div class="section-card">
-          <div class="section-card-header">
-            <div><h2>Guest Reviews</h2><p id="reviews-meta">Loading…</p></div>
-          </div>
-          <div id="reviews-table"></div>
-        </div>
-      </div>
+            async login() {
+                const u = document.getElementById('username').value.trim();
+                const p = document.getElementById('password').value.trim();
+                const res = await fetch('/api/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.success) { localStorage.setItem('admin_token', data.token); location.reload(); }
+                else document.getElementById('login-error').style.display = 'block';
+            },
 
-    </div><!-- /content -->
-  </main>
-</div>
+            logout() { localStorage.removeItem('admin_token'); location.reload(); },
 
-<!-- DETAIL MODAL -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="modal-content"></div>
-</div>
+            async loadDashboard() {
+                const res = await fetch('/api/dashboard');
+                const data = await res.json();
+                document.getElementById('stat-revenue').textContent = `RM ${data.total_revenue.toFixed(2)}`;
+                document.getElementById('stat-bookings').textContent = data.total_bookings;
+                document.getElementById('stat-rooms').textContent = data.total_rooms;
+                document.getElementById('stat-rating').textContent = data.avg_rating;
+                document.getElementById('recent-bookings-table').innerHTML = data.recent_bookings.map(b => `
+                    <tr><td><b>${b.guest_name}</b></td><td>${b.room_name}</td><td>${b.check_in} — ${b.check_out}</td><td>RM ${b.total_price.toFixed(2)}</td><td><span style="color:var(--sage)">Confirmed</span></td></tr>
+                `).join('');
+            },
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+            async loadRooms() {
+                const res = await fetch('/api/rooms');
+                const rooms = await res.json();
+                document.getElementById('inventory-table').innerHTML = rooms.map(r => {
+                    const img = r.image_url?.startsWith('uploads') ? r.image_url : `/images/${r.image_url || 'default-room.jpg'}`;
+                    return `
+                    <tr>
+                        <td>
+                            <div style="position:relative; width:60px; height:40px; overflow:hidden; border-radius:4px">
+                                <img src="${img}" class="room-thumb" onerror="this.src='/images/default-room.jpg'">
+                                <input type="file" onchange="Admin.handleFileUpload('room', ${r.id}, this)" style="position:absolute; inset:0; opacity:0; cursor:pointer">
+                            </div>
+                        </td>
+                        <td><input type="text" value="${r.name}" class="edit-input" id="name-${r.id}"></td>
+                        <td><input type="text" value="${r.type}" class="edit-input" id="type-${r.id}"></td>
+                        <td><input type="number" value="${r.price}" class="edit-input" id="price-${r.id}"></td>
+                        <td><input type="number" value="${r.capacity}" class="edit-input" style="width:50px" id="cap-${r.id}"></td>
+                        <td style="text-align:right"><button class="btn-gold" onclick="Admin.saveRoom(${r.id})">Save</button></td>
+                    </tr>`;
+                }).join('');
+            },
 
-<script>
-const API = '';
-let allRooms = [];
+            async saveRoom(id) {
+                const p = {
+                    name: document.getElementById(`name-${id}`).value,
+                    type: document.getElementById(`type-${id}`).value,
+                    price: parseFloat(document.getElementById(`price-${id}`).value),
+                    capacity: parseInt(document.getElementById(`cap-${id}`).value)
+                };
+                await fetch(`/api/rooms/update/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
+                alert('Changes committed.');
+                this.loadRooms();
+            },
 
-// ── Utils ────────────────────────────────────────────────────────────────────
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  setTimeout(() => t.className = 'toast', 3200);
-}
+            async handleFileUpload(type, id, input) {
+                if (!input.files[0]) return;
+                const fd = new FormData();
+                fd.append('file', input.files[0]);
+                const res = await fetch('/api/upload', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                    if (type === 'qr') {
+                        await fetch('/api/settings/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'qr_code', value: data.path }) });
+                    } else {
+                        await fetch(`/api/rooms/update/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_url: data.path }) });
+                    }
+                    alert('Visual Asset Updated.');
+                    this.refreshAll();
+                }
+            },
 
-function fmtDate(s) {
-  return new Date(s + 'T00:00:00').toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' });
-}
+            async loadReviews() {
+                const res = await fetch('/api/reviews');
+                const data = await res.json();
+                document.getElementById('reviews-table').innerHTML = `
+                    <thead><tr><th>Guest</th><th>Stars</th><th>Comment</th><th>Date</th></tr></thead>
+                    <tbody>${data.reviews.map(r => `<tr><td><b>${r.guest_name}</b></td><td>${'★'.repeat(r.rating)}</td><td style="font-style:italic">"${r.comment}"</td><td>${new Date(r.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody>`;
+            },
 
-function fmtMoney(v) { return 'RM ' + Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+            async loadSettings() {
+                const res = await fetch('/api/settings');
+                const s = await res.json();
+                document.getElementById('set-whatsapp').value = s.whatsapp || '';
+                document.getElementById('qr-preview').src = s.qr_code || '';
+            },
 
-function badgeHtml(status) {
-  return `<span class="badge badge-${status}">${status.toUpperCase()}</span>`;
-}
+            async saveSetting(k) {
+                const v = document.getElementById('set-whatsapp').value;
+                await fetch('/api/settings/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: k, value: v }) });
+                alert('Setting Synchronized.');
+            },
 
-// ── Sections ─────────────────────────────────────────────────────────────────
-const sections = ['overview','rooms','reviews'];
-const titles   = { overview:'Overview', rooms:'Rooms', reviews:'Reviews' };
+            openAddRoomModal() { document.getElementById('add-room-modal').style.display = 'flex'; },
+            closeAddRoomModal() { document.getElementById('add-room-modal').style.display = 'none'; },
 
-function showSection(name) {
-  sections.forEach(s => {
-    document.getElementById('section-' + s).style.display = (s === name) ? '' : 'none';
-  });
-  document.getElementById('page-title').textContent = titles[name];
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-  document.querySelectorAll('.sidebar-nav a').forEach(a => {
-    if (a.textContent.trim().toLowerCase().includes(name)) a.classList.add('active');
-  });
-  if (name === 'rooms')    loadRooms();
-  if (name === 'reviews')  loadReviews();
-}
+            async submitNewRoom() {
+                const payload = {
+                    name: document.getElementById('new-room-name').value,
+                    type: document.getElementById('new-room-type').value,
+                    price: parseFloat(document.getElementById('new-room-price').value),
+                    capacity: parseInt(document.getElementById('new-room-cap').value),
+                    description: document.getElementById('new-room-desc').value,
+                    amenities: "WiFi, Air Conditioning",
+                    image_url: "default-room.jpg"
+                };
+                if (!payload.name) return alert('Room name is required.');
+                await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                this.closeAddRoomModal();
+                this.loadRooms();
+                alert('New Suite Initialized.');
+            },
 
-// ── Overview ──────────────────────────────────────────────────────────────────
-async function loadDashboard() {
-  try {
-    const res  = await fetch(`${API}/api/dashboard`);
-    const data = await res.json();
-
-    document.getElementById('topbar-meta').textContent = new Date().toLocaleDateString('en-MY', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-
-    document.getElementById('stats-grid').innerHTML = `
-      <div class="stat-card">
-        <div class="stat-icon">🏡</div>
-        <p class="stat-label">Rooms</p>
-        <div class="stat-val">${data.total_rooms}</div>
-        <p class="stat-sub">Room types available</p>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⭐</div>
-        <p class="stat-label">Avg Rating</p>
-        <div class="stat-val">${data.avg_rating}</div>
-        <p class="stat-sub">Out of 5 stars</p>
-      </div>`;
-
-
-  } catch(e) {
-    document.getElementById('stats-grid').innerHTML = `<p style="color:var(--red);grid-column:1/-1;text-align:center">Failed to load dashboard data.</p>`;
-  }
-}
-
-
-
-// ── Rooms ────────────────────────────────────────────────────────────────────
-async function loadRooms() {
-  document.getElementById('rooms-table').innerHTML = `<div class="spinner"></div>`;
-  try {
-    const res   = await fetch(`${API}/api/rooms`);
-    allRooms = await res.json();
-    document.getElementById('rooms-table').innerHTML = `
-      <table>
-        <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Price/Night</th><th>Capacity</th><th>Amenities</th></tr></thead>
-        <tbody>
-          ${allRooms.map(r => `
-          <tr>
-            <td style="color:var(--text-dim)">#${r.id}</td>
-            <td><strong>${r.name}</strong></td>
-            <td><span class="badge" style="background:var(--gold-dim);color:var(--gold)">${r.type}</span></td>
-            <td>${fmtMoney(r.price)}</td>
-            <td>${r.capacity} guests</td>
-            <td style="font-size:.8rem;color:var(--text-dim)">${(Array.isArray(r.amenities) ? r.amenities : []).join(', ')}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
-  } catch(e) {
-    document.getElementById('rooms-table').innerHTML = `<div class="empty">Failed to load rooms.</div>`;
-  }
-}
-
-// ── Reviews ───────────────────────────────────────────────────────────────────
-async function loadReviews() {
-  document.getElementById('reviews-table').innerHTML = `<div class="spinner"></div>`;
-  try {
-    const res  = await fetch(`${API}/api/reviews`);
-    const data = await res.json();
-    document.getElementById('reviews-meta').textContent = `${data.reviews.length} reviews · Avg: ${data.average_rating} ★`;
-    document.getElementById('reviews-table').innerHTML = `
-      <table>
-        <thead><tr><th>Guest</th><th>Rating</th><th>Comment</th><th>Date</th></tr></thead>
-        <tbody>
-          ${data.reviews.map(r => `
-          <tr>
-            <td>${r.guest_name}</td>
-            <td><span style="color:var(--gold)">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span></td>
-            <td style="font-size:.88rem;max-width:360px">${r.comment || '—'}</td>
-            <td style="color:var(--text-dim);font-size:.82rem">${new Date(r.created_at).toLocaleDateString('en-MY')}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
-  } catch(e) {
-    document.getElementById('reviews-table').innerHTML = `<div class="empty">Failed to load reviews.</div>`;
-  }
-}
-
-
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-loadDashboard();
-</script>
+            showSection(id) {
+                document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
+                document.getElementById(`section-${id}`).classList.add('active');
+                document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+                document.getElementById(`nav-${id}`).classList.add('active');
+            }
+        };
+        Admin.init();
+    </script>
 </body>
 </html>

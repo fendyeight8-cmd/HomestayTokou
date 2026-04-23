@@ -65,6 +65,29 @@ def init_db():
                 comment     TEXT,
                 created_at  TEXT DEFAULT (datetime('now'))
             );
+
+            CREATE TABLE IF NOT EXISTS bookings (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                room_id     INTEGER NOT NULL,
+                guest_name  TEXT NOT NULL,
+                check_in    TEXT NOT NULL,
+                check_out   TEXT NOT NULL,
+                total_price REAL NOT NULL,
+                status      TEXT DEFAULT 'confirmed',
+                created_at  TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (room_id) REFERENCES rooms (id)
+            );
+
+            CREATE TABLE IF NOT EXISTS settings (
+                key         TEXT PRIMARY KEY,
+                value       TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS users (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                username    TEXT UNIQUE NOT NULL,
+                password    TEXT NOT NULL
+            );
         """)
 
         # Seed data
@@ -103,7 +126,26 @@ def init_db():
                 INSERT INTO reviews (booking_id, guest_name, rating, comment)
                 VALUES (?, ?, ?, ?)
             """, reviews)
+
+            # Seed Bookings for Sales Dashboard
+            bookings = [
+                (1, "Ahmad Faiz", "2026-04-24", "2026-04-26", 176.00, "confirmed"),
+                (3, "Sarah Wilson", "2026-04-25", "2026-04-28", 324.00, "confirmed"),
+                (6, "Chin Wei", "2026-05-01", "2026-05-03", 216.00, "confirmed")
+            ]
+            cur.executemany("""
+                INSERT INTO bookings (room_id, guest_name, check_in, check_out, total_price, status)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, bookings)
             logger.info("Database seeded with initial data.")
+
+        # Seed Admin & Settings
+        cur.execute("SELECT COUNT(*) FROM users")
+        if cur.fetchone()[0] == 0:
+            cur.execute("INSERT INTO users (username, password) VALUES (?, ?)", ("admin", "admin123"))
+            cur.execute("INSERT INTO settings (key, value) VALUES (?, ?)", ("whatsapp", "+601110085626"))
+            cur.execute("INSERT INTO settings (key, value) VALUES (?, ?)", ("qr_code", "payment-qr.jpg"))
+            logger.info("Admin and Settings seeded.")
 
     logger.info(f"Database initialised at {DB_PATH}")
 
@@ -158,13 +200,52 @@ def handle_get_reviews() -> Tuple[int, bytes]:
 def handle_dashboard() -> Tuple[int, bytes]:
     with Database(DB_PATH) as conn:
         stats = {
-            "total_bookings": 0,
-            "total_revenue":  0,
+            "total_bookings": conn.execute("SELECT COUNT(*) FROM bookings").fetchone()[0],
+            "total_revenue":  round(conn.execute("SELECT SUM(total_price) FROM bookings").fetchone()[0] or 0, 2),
             "total_rooms":    conn.execute("SELECT COUNT(*) FROM rooms").fetchone()[0],
             "avg_rating":     round(conn.execute("SELECT AVG(rating) FROM reviews").fetchone()[0] or 0, 1),
-            "recent_bookings": [],
+            "recent_bookings": rows_to_list(conn.execute("""
+                SELECT b.*, r.name as room_name 
+                FROM bookings b 
+                JOIN rooms r ON b.room_id = r.id 
+                ORDER BY b.created_at DESC LIMIT 5
+            """).fetchall()),
         }
         return json_response(stats)
+
+def handle_login(data: Dict[str, Any]) -> Tuple[int, bytes]:
+    username = data.get('username', '').strip()
+    password = data.get('password', '').strip()
+    logger.info(f"[LOGIN ATTEMPT] User: {username}")
+    with Database(DB_PATH) as conn:
+        user = conn.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password)).fetchone()
+        if user:
+            return json_response({"success": True, "token": "admin_session_active"})
+        return json_response({"success": False, "error": "Invalid credentials"}, 401)
+
+def handle_update_room(rid: int, data: Dict[str, Any]) -> Tuple[int, bytes]:
+    with Database(DB_PATH) as conn:
+        conn.execute("UPDATE rooms SET price=?, name=?, type=?, capacity=? WHERE id=?", 
+                    (data['price'], data['name'], data['type'], data['capacity'], rid))
+        return json_response({"success": True})
+
+def handle_add_room(data: Dict[str, Any]) -> Tuple[int, bytes]:
+    with Database(DB_PATH) as conn:
+        conn.execute("INSERT INTO rooms (name, type, price, capacity, description, amenities, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (data['name'], data['type'], data['price'], data['capacity'], data['description'], data['amenities'], data['image_url']))
+        return json_response({"success": True})
+
+def handle_get_settings() -> Tuple[int, bytes]:
+    with Database(DB_PATH) as conn:
+        settings = rows_to_list(conn.execute("SELECT * FROM settings").fetchall())
+        return json_response({s['key']: s['value'] for s in settings})
+
+def handle_update_setting(data: Dict[str, Any]) -> Tuple[int, bytes]:
+    key = data.get('key')
+    val = data.get('value')
+    with Database(DB_PATH) as conn:
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (key, val))
+        return json_response({"success": True})
 
 # ─── HTTP Server ──────────────────────────────────────────────────────────────
 
@@ -197,6 +278,11 @@ class HomestayHandler(BaseHTTPRequestHandler):
            clean_filename.endswith(('.py', '.db', '.env', '.sh')) or \
            clean_filename.startswith(('.git', '__pycache__')):
             return self.send_json(*json_response({"error": "Access denied"}, 403))
+
+        # Auto-create uploads if requested
+        if clean_filename.startswith('uploads') or clean_filename.startswith('images'):
+            os.makedirs(os.path.join(os.path.dirname(__file__), 'uploads'), exist_ok=True)
+            os.makedirs(os.path.join(os.path.dirname(__file__), 'images'), exist_ok=True)
 
         if not os.path.isfile(filepath):
             return self.send_json(*json_response({"error": "File not found"}, 404))
@@ -247,6 +333,7 @@ class HomestayHandler(BaseHTTPRequestHandler):
                     return self.send_json(*json_response({"error": "Invalid Room ID"}, 400))
             if path == '/api/reviews': return self.send_json(*handle_get_reviews())
             if path == '/api/dashboard': return self.send_json(*handle_dashboard())
+            if path == '/api/settings': return self.send_json(*handle_get_settings())
 
             # Static assets
             return self.send_file(path.lstrip('/'))
@@ -255,14 +342,71 @@ class HomestayHandler(BaseHTTPRequestHandler):
             self.send_json(*json_response({"error": "Internal server error"}, 500))
 
     def do_POST(self):
-        parsed = urlparse(self.path)
-        path = parsed.path.rstrip('/')
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_length)
+        try:
+            data = json.loads(post_data) if post_data else {}
+        except:
+            data = {}
+
+        path = urlparse(self.path).path
+        logger.info(f"[POST TRACE] Request Path: {path}")
         
         try:
+            if path.rstrip('/') == '/api/login': return self.send_json(*handle_login(data))
+            if path.rstrip('/') == '/api/rooms': return self.send_json(*handle_add_room(data))
+            if path.startswith('/api/rooms/update/'):
+                rid = int(path.split('/')[-1])
+                return self.send_json(*handle_update_room(rid, data))
+            if path.rstrip('/') == '/api/settings/update': return self.send_json(*handle_update_setting(data))
+            
+            if path == '/api/upload':
+                return self.handle_upload()
+
             self.send_json(*json_response({"error": "Not found"}, 404))
         except Exception as e:
             logger.error(f"Error handling POST {path}: {e}")
             self.send_json(*json_response({"error": "Internal server error"}, 500))
+
+    def handle_upload(self):
+        try:
+            content_type = self.headers.get('Content-Type')
+            if not content_type or 'multipart/form-data' not in content_type:
+                return self.send_json(*json_response({"error": "Invalid Content-Type"}, 400))
+            
+            boundary = content_type.split("boundary=")[1].encode()
+            content_length = int(self.headers.get('Content-Length'))
+            body = self.rfile.read(content_length)
+            
+            # More robust multipart parsing
+            parts = body.split(b'--' + boundary)
+            for part in parts:
+                if b'filename="' in part:
+                    # Extract filename and content
+                    header_part, content = part.split(b'\r\n\r\n', 1)
+                    filename = re.findall(r'filename="([^"]+)"', header_part.decode())[0]
+                    # Remove trailing \r\n
+                    content = content.rstrip(b'\r\n')
+                    # Remove trailing --
+                    if content.endswith(b'--'): content = content[:-2]
+                    
+                    upload_dir = os.path.join(os.path.dirname(__file__), 'uploads')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    # Sanitize filename
+                    filename = "".join([c for c in filename if c.isalnum() or c in '._-']).strip()
+                    save_path = os.path.join(upload_dir, filename)
+                    
+                    with open(save_path, 'wb') as f:
+                        f.write(content)
+                    
+                    logger.info(f"File uploaded successfully: {filename}")
+                    return self.send_json(*json_response({"success": True, "path": f"uploads/{filename}"}))
+            
+            return self.send_json(*json_response({"error": "No file found in multipart data"}, 400))
+        except Exception as e:
+            logger.error(f"Upload error: {e}")
+            return self.send_json(*json_response({"error": str(e)}, 500))
 
     def do_DELETE(self):
         path = urlparse(self.path).path.rstrip('/')
