@@ -253,7 +253,8 @@
   }
   .section-sub {
     color: var(--mid-brown); font-weight: 300; font-size: 1.05rem;
-    max-width: 850px; line-height: 1.7; text-align: left;
+    max-width: 850px; line-height: 1.7; text-align: inherit;
+    margin-bottom: 1rem;
   }
 
   /* ── ROOMS ── */
@@ -305,19 +306,20 @@
 
   .room-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
   .room-type {
-    font-size: .7rem; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--copper); font-weight: 600; margin-bottom: .4rem;
+    font-size: .8rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--mid-brown); font-weight: 700; margin-bottom: .4rem;
   }
   .room-name {
     font-family: 'Playfair Display', serif;
-    font-size: 1.3rem; color: var(--deep-brown); margin-bottom: .6rem;
+    font-size: 1.4rem; color: var(--deep-brown); margin-bottom: .8rem;
+    line-height: 1.2;
   }
   .room-desc {
-    font-size: .88rem; color: var(--mid-brown); line-height: 1.6;
-    margin-bottom: 1.2rem;
-    min-height: 3.2rem; /* 2 lines minimum */
+    font-size: .95rem; color: var(--deep-brown); line-height: 1.6;
+    margin-bottom: 1.5rem;
+    min-height: 4.8rem; /* 3 lines minimum */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -327,9 +329,10 @@
     align-content: flex-start;
   }
   .amenity-tag {
-    font-size: .72rem; background: var(--cream);
-    color: var(--mid-brown); padding: .25rem .65rem; border-radius: 20px;
+    font-size: .78rem; background: rgba(93, 64, 55, 0.08);
+    color: var(--deep-brown); padding: .35rem .85rem; border-radius: 4px;
     font-weight: 500;
+    border: 1px solid rgba(93, 64, 55, 0.1);
   }
   .room-footer {
     display: flex; justify-content: space-between; align-items: center;
@@ -467,48 +470,61 @@
     gap: 2.5rem; margin-top: 3.5rem;
   }
   .feature-card {
-    text-align: center; padding: 1.5rem;
-    background: white; border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center; padding: 2rem;
+    background: white; border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(62, 39, 35, 0.05);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+    border: 1px solid rgba(212,168,83,0.05);
   }
   .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 45px rgba(62, 39, 35, 0.12);
   }
   .feature-image {
-    width: 100%; height: 200px; margin-bottom: 1.5rem;
-    border-radius: 4px; overflow: hidden;
+    width: 100%; height: 220px; margin-bottom: 1.5rem;
+    border-radius: 8px; overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   }
   .feature-image img {
     width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.6s ease;
   }
   .feature-card:hover .feature-image img {
-    transform: scale(1.05);
+    transform: scale(1.08);
   }
   .feature-card h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.25rem; margin-bottom: .75rem;
+    font-size: 1.4rem; margin-bottom: .8rem;
     color: var(--deep-brown);
   }
   .feature-card p {
-    font-size: 0.9rem; color: var(--mid-brown);
+    font-size: 0.95rem; color: var(--mid-brown);
     line-height: 1.7; margin: 0;
   }
 
   /* ── REVIEWS ── */
   #reviews { background: var(--warm-white); }
-  .reviews-header { margin-bottom: 3rem; }
+  .reviews-header { 
+    text-align: center;
+    margin-bottom: 4rem; 
+  }
   .rating-overall {
-    display: inline-flex; align-items: center; gap: .8rem;
-    margin-top: 1rem;
+    display: inline-flex; 
+    align-items: center; 
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    background: white;
+    padding: 1.2rem 2.5rem;
+    border-radius: 100px;
+    box-shadow: 0 15px 45px rgba(62, 39, 35, 0.08);
+    border: 1px solid rgba(212,168,83,0.1);
   }
   .rating-num {
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem; line-height: 1; color: var(--deep-brown);
+    font-size: 4.5rem; line-height: 1; color: var(--deep-brown);
+    font-weight: 700;
   }
-  .stars { color: var(--gold); font-size: 1.3rem; }
+  .stars { color: var(--gold); font-size: 1.4rem; margin-bottom: 0.2rem; }
 
   .reviews-grid {
     display: grid;
@@ -516,15 +532,21 @@
     gap: 1.5rem;
   }
   .review-card {
-    background: white; border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 5px 20px var(--shadow);
-    border-top: 4px solid var(--sage);
+    background: white; border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(62, 39, 35, 0.05);
+    border: 1px solid rgba(212,168,83,0.08);
+    text-align: center;
+    transition: transform 0.3s;
   }
-  .review-stars { color: var(--gold); margin-bottom: .6rem; }
-  .review-text { font-size: .9rem; color: var(--mid-brown); line-height: 1.7; margin-bottom: 1rem; font-style: italic; }
-  .review-author { font-weight: 600; font-size: .88rem; color: var(--deep-brown); }
-  .review-date { font-size: .75rem; color: var(--copper); }
+  .review-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(62, 39, 35, 0.1); }
+  .review-stars { color: var(--gold); margin-bottom: 1rem; font-size: 1.1rem; }
+  .review-text { 
+    font-size: 1rem; color: var(--deep-brown); line-height: 1.8; 
+    margin-bottom: 1.5rem; font-style: italic; 
+  }
+  .review-author { font-weight: 700; font-size: 0.95rem; color: var(--deep-brown); display: block; margin-bottom: 0.2rem; }
+  .review-date { font-size: .8rem; color: var(--gold); font-weight: 500; }
 
   /* ── LOOKUP ── */
   #lookup { background: var(--deep-brown); }
@@ -841,10 +863,10 @@
 
 <!-- ABOUT -->
 <section id="about">
-  <div style="max-width:900px;">
+  <div style="max-width:900px; margin: 0 auto; text-align: center;">
     <p class="section-label" data-t="section_about_label">Why Choose Us</p>
     <h2 class="section-title" data-t="section_about_title">A Home Away From Home</h2>
-    <p class="section-sub" data-t="section_about_sub">Nestled in the heart of Sapi-Nangoh, Sabah, our homestay offers more than just a place to stay it’s an invitation to slow down and truly experience rural life. Surrounded by lush landscapes and the rhythms of nature, we blend authentic local living with thoughtful comfort. Whether you’re here to unwind, explore, or connect with the community, every stay is designed to be simple, warm, and meaningful.</p>
+    <p class="section-sub" data-t="section_about_sub" style="margin: 0 auto;">Nestled in the heart of Sapi-Nangoh, Sabah, our homestay offers more than just a place to stay it’s an invitation to slow down and truly experience rural life. Surrounded by lush landscapes and the rhythms of nature, we blend authentic local living with thoughtful comfort. Whether you’re here to unwind, explore, or connect with the community, every stay is designed to be simple, warm, and meaningful.</p>
   </div>
   <div class="features-grid">
     <div class="feature-card">
