@@ -1303,41 +1303,52 @@ const App = {
 
     UI.elements.modalBody.innerHTML = `
       <div id="booking-form-view">
-        <div class="booking-summary">
-          <div class="summary-item"><label>Check In</label><p>${UI.formatDate(ci)}</p></div>
-          <div class="summary-item"><label>Check Out</label><p>${UI.formatDate(co)}</p></div>
-          <div class="summary-item"><label>Nights</label><p>${nights}</p></div>
+        <div class="booking-summary" id="modal-summary">
+          <div class="summary-item"><label>Check In</label><p id="summary-ci">${UI.formatDate(ci)}</p></div>
+          <div class="summary-item"><label>Check Out</label><p id="summary-co">${UI.formatDate(co)}</p></div>
+          <div class="summary-item"><label>Nights</label><p id="summary-nights">${nights}</p></div>
           <div class="summary-item"><label>Rate</label><p>${CONFIG.CURRENCY} ${room.price}</p></div>
-          <div class="summary-total"><span>Total</span><span>${CONFIG.CURRENCY} ${total.toFixed(2)}</span></div>
+          <div class="summary-total"><span>Total</span><span id="summary-total">${CONFIG.CURRENCY} ${total.toFixed(2)}</span></div>
         </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Duration (Nights)</label>
+            <select id="b-duration" onchange="App.updateBookingDates()">
+              ${[1,2,3,4,5,6,7,10,14].map(n => `<option value="${n}" ${n === nights ? 'selected' : ''}>${n} ${n > 1 ? 'Nights' : 'Night'}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Guests</label>
+            <select id="b-guests">
+              ${Array.from({length: room.capacity}, (_,i) => `<option value="${i+1}" ${this.search.guests == i+1 ? 'selected' : ''}>${i+1}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
         <div class="form-group">
           <label>Full Name *</label>
           <input type="text" id="b-name" placeholder="John Doe">
         </div>
-        <div class="form-group">
-          <label>Guests</label>
-          <select id="b-guests">
-            ${Array.from({length: room.capacity}, (_,i) => `<option value="${i+1}" ${this.search.guests == i+1 ? 'selected' : ''}>${i+1}</option>`).join('')}
-          </select>
-        </div>
+
         <div class="form-group">
           <label>Special Requests</label>
           <textarea id="b-special" rows="2"></textarea>
         </div>
         
         <div class="booking-options">
-          <button class="btn-outline" onclick="App.submitBooking('${ci}', '${co}', 'whatsapp')" style="font-size:0.85rem; padding: 0.8rem 0.5rem; border-color: var(--sage); color: var(--sage);">Option 1: Chat with Owner</button>
-          <button class="btn-primary" onclick="App.showQRView('${ci}', '${co}')" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 2: Pay & Book</button>
+          <button class="btn-outline" onclick="App.submitBooking('whatsapp')" style="font-size:0.85rem; padding: 0.8rem 0.5rem; border-color: var(--sage); color: var(--sage);">Option 1: Chat with Owner</button>
+          <button class="btn-primary" onclick="App.showQRView()" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 2: Pay & Book</button>
         </div>
-        <button id="shareBtn" class="btn-outline btn-block mt-1" style="border:none; color:var(--mid-brown); font-size:0.8rem; background:none;" onclick="App.shareBooking('${ci}', '${co}')">Share this stay</button>
+        <button id="shareBtn" class="btn-outline btn-block mt-1" style="border:none; color:var(--mid-brown); font-size:0.8rem; background:none;" onclick="App.shareBooking()">Share this stay</button>
       </div>
 
       <div id="qr-payment-view" class="qr-container">
         <h3 style="font-family:'Playfair Display', serif; margin-bottom:0.5rem;">Secure Payment</h3>
-        <p class="payment-instruction">Please scan the QR code below to make your payment of <strong>${CONFIG.CURRENCY} ${total.toFixed(2)}</strong>.</p>
+        <p class="payment-instruction">Please scan the QR code below to make your payment of <strong id="qr-total-display">${CONFIG.CURRENCY} ${total.toFixed(2)}</strong>.</p>
         <img src="/images/QR.png" alt="Payment QR Code" class="qr-image" onerror="this.src='https://placehold.co/200x200?text=Scan+to+Pay'">
         <p class="payment-instruction" style="font-size:0.75rem;">Once payment is complete, click the button below to notify the owner via WhatsApp.</p>
-        <button class="btn-primary btn-block" onclick="App.submitBooking('${ci}', '${co}', 'qr_paid')">I Have Made Payment</button>
+        <button class="btn-primary btn-block" onclick="App.submitBooking('qr_paid')">I Have Made Payment</button>
         <button class="btn-outline btn-block mt-1" onclick="App.showFormView()" style="border:none;">Go Back</button>
       </div>
     `;
@@ -1345,7 +1356,24 @@ const App = {
     UI.toggleModal(true);
   },
 
-  showQRView(ci, co) {
+  updateBookingDates() {
+    const ciVal = this.search.check_in || new Date().toISOString().split('T')[0];
+    const nights = parseInt(document.getElementById('b-duration').value);
+    const ciDate = new Date(ciVal + 'T00:00:00');
+    const coDate = new Date(ciDate);
+    coDate.setDate(ciDate.getDate() + nights);
+    const coVal = coDate.toISOString().split('T')[0];
+    const total = nights * this.selectedRoom.price;
+
+    document.getElementById('summary-co').textContent = UI.formatDate(coVal);
+    document.getElementById('summary-nights').textContent = nights;
+    document.getElementById('summary-total').textContent = `${CONFIG.CURRENCY} ${total.toFixed(2)}`;
+    
+    const qrTotal = document.getElementById('qr-total-display');
+    if (qrTotal) qrTotal.textContent = `${CONFIG.CURRENCY} ${total.toFixed(2)}`;
+  },
+
+  showQRView() {
     const name = document.getElementById('b-name').value.trim();
     if (!name) {
       UI.showToast('Please enter your name before proceeding to payment.', 'error');
@@ -1362,15 +1390,22 @@ const App = {
 
   closeBooking() { UI.toggleModal(false); },
 
-  submitBooking(check_in, check_out, method) {
-    const guest_name = document.getElementById('b-name').value.trim();
+  submitBooking(method) {
+    const ciVal = this.search.check_in || new Date().toISOString().split('T')[0];
+    const nights = parseInt(document.getElementById('b-duration').value);
     const guests = document.getElementById('b-guests').value;
+    const guest_name = document.getElementById('b-name').value.trim();
     const special = document.getElementById('b-special').value.trim();
 
     if (!guest_name) {
       UI.showToast('Please enter your name.', 'error');
       return;
     }
+
+    const ciDate = new Date(ciVal + 'T00:00:00');
+    const coDate = new Date(ciDate);
+    coDate.setDate(ciDate.getDate() + nights);
+    const coVal = coDate.toISOString().split('T')[0];
 
     let msg = ``;
     if (method === 'qr_paid') {
@@ -1382,14 +1417,14 @@ const App = {
     }
 
     msg += `• Room: ${this.selectedRoom.name}\n`;
-    msg += `• Check-in: ${UI.formatDate(check_in)}\n`;
-    msg += `• Check-out: ${UI.formatDate(check_out)}\n`;
+    msg += `• Check-in: ${UI.formatDate(ciVal)}\n`;
+    msg += `• Check-out: ${UI.formatDate(coVal)}\n`;
+    msg += `• Nights: ${nights}\n`;
     msg += `• Guests: ${guests}\n`;
     msg += `• Name: ${guest_name}\n`;
     
     if (method === 'qr_paid') {
-      const nights = Math.round((new Date(check_out) - new Date(check_in)) / 86400000);
-      const total = (nights || 1) * this.selectedRoom.price;
+      const total = nights * this.selectedRoom.price;
       msg += `• Total Paid: RM ${total.toFixed(2)}\n`;
       msg += `\n(I will send my payment receipt below)`;
     }
@@ -1403,10 +1438,16 @@ const App = {
     this.closeBooking();
   },
 
-  // New method to generate a shareable URL for the booking
-  shareBooking(check_in, check_out) {
+  shareBooking() {
+    const ciVal = this.search.check_in || new Date().toISOString().split('T')[0];
+    const nights = parseInt(document.getElementById('b-duration').value);
     const guests = document.getElementById('b-guests').value;
-    const shareUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(this.selectedRoom.name)}&checkin=${check_in}&checkout=${check_out}&guests=${guests}`;
+    const ciDate = new Date(ciVal + 'T00:00:00');
+    const coDate = new Date(ciDate);
+    coDate.setDate(ciDate.getDate() + nights);
+    const coVal = coDate.toISOString().split('T')[0];
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(this.selectedRoom.name)}&checkin=${ciVal}&checkout=${coVal}&guests=${guests}`;
     if (navigator.share) {
       navigator.share({
         title: 'HomeStay Baru – Booking',
