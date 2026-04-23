@@ -1363,26 +1363,27 @@ const App = {
 
     let msg = ``;
     if (method === 'qr_paid') {
-      msg = `✅ *PAYMENT NOTIFICATION*\n\n`;
-      msg += `I have made the payment for the following booking:\n\n`;
+      msg = `*NEW BOOKING PAYMENT*\n\n`;
+      msg += `I have completed the payment for my stay. Here are the details:\n\n`;
     } else {
-      msg = `Hi Homestay Tokou, I am interested in booking:\n\n`;
+      msg = `*BOOKING INQUIRY*\n\n`;
+      msg += `Hello, I would like to check availability for the following:\n\n`;
     }
 
-    msg += `🏨 *Room:* ${this.selectedRoom.name}\n`;
-    msg += `📅 *Check-in:* ${UI.formatDate(check_in)}\n`;
-    msg += `📅 *Check-out:* ${UI.formatDate(check_out)}\n`;
-    msg += `👥 *Guests:* ${guests}\n`;
-    msg += `👤 *Name:* ${guest_name}\n`;
+    msg += `• Room: ${this.selectedRoom.name}\n`;
+    msg += `• Check-in: ${UI.formatDate(check_in)}\n`;
+    msg += `• Check-out: ${UI.formatDate(check_out)}\n`;
+    msg += `• Guests: ${guests}\n`;
+    msg += `• Name: ${guest_name}\n`;
     
     if (method === 'qr_paid') {
       const nights = Math.round((new Date(check_out) - new Date(check_in)) / 86400000);
       const total = (nights || 1) * this.selectedRoom.price;
-      msg += `💰 *Amount Paid:* ${CONFIG.CURRENCY} ${total.toFixed(2)}\n`;
-      msg += `\n(I will send the receipt as an attachment next)\n`;
+      msg += `• Total Paid: RM ${total.toFixed(2)}\n`;
+      msg += `\n(I will send my payment receipt below)`;
     }
 
-    if (special) msg += `\n📝 *Special Requests:* ${special}`;
+    if (special) msg += `\n\n• Special Request: ${special}`;
 
     const encodedMsg = encodeURIComponent(msg);
     const whatsappUrl = `https://wa.me/601110085626?text=${encodedMsg}`;
