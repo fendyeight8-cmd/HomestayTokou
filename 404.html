@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found — {{ prop_name }}{% endblock %}
+{% block content %}
+<div style="padding-top:74px;min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--linen)">
+  <div>
+    <div style="font-size:72px;margin-bottom:16px">🌿</div>
+    <h1 style="font-family:var(--ff-display);font-size:48px;font-weight:300;color:var(--bark-800);margin-bottom:10px">
+      Lost in the forest?
+    </h1>
+    <p style="font-size:16px;font-weight:300;color:var(--bark-400);max-width:380px;line-height:1.7;margin:0 auto 32px">
+      This page doesn't exist. Let's find you somewhere comfortable to stay.
+    </p>
+    <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+      <a href="/" class="btn-primary">
+        Back to Home
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="/rooms" class="btn-outline">View Rooms</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
