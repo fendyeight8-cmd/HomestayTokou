@@ -707,6 +707,36 @@
     background: var(--sage);
     color: white;
   }
+  .qr-container {
+    text-align: center;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid rgba(212,168,83,0.3);
+    border-radius: 4px;
+    margin-top: 1rem;
+    display: none;
+  }
+  .qr-container.show { display: block; }
+  .qr-image {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 1rem;
+    display: block;
+    object-fit: contain;
+    border: 1px solid #eee;
+  }
+  .payment-instruction {
+    font-size: 0.85rem;
+    color: var(--mid-brown);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .booking-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
 </style>
 </head>
 <body>
@@ -1261,36 +1291,67 @@ const App = {
     const co = check_out || new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
     UI.elements.modalBody.innerHTML = `
-      <div class="booking-summary">
-        <div class="summary-item"><label>Check In</label><p>${UI.formatDate(ci)}</p></div>
-        <div class="summary-item"><label>Check Out</label><p>${UI.formatDate(co)}</p></div>
-        <div class="summary-item"><label>Nights</label><p>${nights}</p></div>
-        <div class="summary-item"><label>Rate</label><p>${CONFIG.CURRENCY} ${room.price}</p></div>
-        <div class="summary-total"><span>Total</span><span>${CONFIG.CURRENCY} ${total.toFixed(2)}</span></div>
+      <div id="booking-form-view">
+        <div class="booking-summary">
+          <div class="summary-item"><label>Check In</label><p>${UI.formatDate(ci)}</p></div>
+          <div class="summary-item"><label>Check Out</label><p>${UI.formatDate(co)}</p></div>
+          <div class="summary-item"><label>Nights</label><p>${nights}</p></div>
+          <div class="summary-item"><label>Rate</label><p>${CONFIG.CURRENCY} ${room.price}</p></div>
+          <div class="summary-total"><span>Total</span><span>${CONFIG.CURRENCY} ${total.toFixed(2)}</span></div>
+        </div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="b-name" placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label>Guests</label>
+          <select id="b-guests">
+            ${Array.from({length: room.capacity}, (_,i) => `<option value="${i+1}" ${this.search.guests == i+1 ? 'selected' : ''}>${i+1}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Special Requests</label>
+          <textarea id="b-special" rows="2"></textarea>
+        </div>
+        
+        <div class="booking-options">
+          <button class="btn-outline" onclick="App.submitBooking('${ci}', '${co}', 'whatsapp')" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 1: Chat with Owner</button>
+          <button class="btn-primary" onclick="App.showQRView('${ci}', '${co}')" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 2: Pay & Book</button>
+        </div>
+        <button id="shareBtn" class="btn-outline btn-block mt-1" style="border:none; color:var(--mid-brown); font-size:0.8rem;" onclick="App.shareBooking('${ci}', '${co}')">Share this stay</button>
       </div>
-      <div class="form-group">
-        <label>Full Name *</label>
-        <input type="text" id="b-name" placeholder="John Doe">
+
+      <div id="qr-payment-view" class="qr-container">
+        <h3 style="font-family:'Playfair Display', serif; margin-bottom:0.5rem;">Secure Payment</h3>
+        <p class="payment-instruction">Please scan the QR code below to make your payment of <strong>${CONFIG.CURRENCY} ${total.toFixed(2)}</strong>.</p>
+        <img src="/images/qr-placeholder.png" alt="Payment QR Code" class="qr-image" onerror="this.src='https://placehold.co/200x200?text=Scan+to+Pay'">
+        <p class="payment-instruction" style="font-size:0.75rem;">Once payment is complete, click the button below to notify the owner via WhatsApp.</p>
+        <button class="btn-primary btn-block" onclick="App.submitBooking('${ci}', '${co}', 'qr_paid')">I Have Made Payment</button>
+        <button class="btn-outline btn-block mt-1" onclick="App.showFormView()" style="border:none;">Go Back</button>
       </div>
-      <div class="form-group">
-        <label>Guests</label>
-        <select id="b-guests">
-          ${Array.from({length: room.capacity}, (_,i) => `<option value="${i+1}" ${this.search.guests == i+1 ? 'selected' : ''}>${i+1}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Special Requests</label>
-        <textarea id="b-special" rows="2"></textarea>
-      </div>
-      <button class="btn-primary btn-block mt-1" onclick="App.submitBooking('${ci}', '${co}')">Book via WhatsApp</button>
-      <button id="shareBtn" class="btn-outline btn-block mt-1" onclick="App.shareBooking('${ci}', '${co}')">Share this stay</button>`;
+    `;
 
     UI.toggleModal(true);
   },
 
+  showQRView(ci, co) {
+    const name = document.getElementById('b-name').value.trim();
+    if (!name) {
+      UI.showToast('Please enter your name before proceeding to payment.', 'error');
+      return;
+    }
+    document.getElementById('booking-form-view').style.display = 'none';
+    document.getElementById('qr-payment-view').classList.add('show');
+  },
+
+  showFormView() {
+    document.getElementById('booking-form-view').style.display = 'block';
+    document.getElementById('qr-payment-view').classList.remove('show');
+  },
+
   closeBooking() { UI.toggleModal(false); },
 
-  submitBooking(check_in, check_out) {
+  submitBooking(check_in, check_out, method) {
     const guest_name = document.getElementById('b-name').value.trim();
     const guests = document.getElementById('b-guests').value;
     const special = document.getElementById('b-special').value.trim();
@@ -1300,15 +1361,30 @@ const App = {
       return;
     }
 
-    let msg = `Dear HomeStay Tokou Team,\n\nI would like to book the following accommodation:\n\nRoom: ${this.selectedRoom.name}\n`;
-    msg += `Check-in: ${UI.formatDate(check_in)}\n`;
-    msg += `Check-out: ${UI.formatDate(check_out)}\n`;
-    msg += `Guests: ${guests}\n`;
-    msg += `Name: ${guest_name}\n`;
-    if (special) msg += `Special Requests: ${special}`;
+    let msg = ``;
+    if (method === 'qr_paid') {
+      msg = `✅ *PAYMENT NOTIFICATION*\n\n`;
+      msg += `I have made the payment for the following booking:\n\n`;
+    } else {
+      msg = `Hi Homestay Tokou, I am interested in booking:\n\n`;
+    }
+
+    msg += `🏨 *Room:* ${this.selectedRoom.name}\n`;
+    msg += `📅 *Check-in:* ${UI.formatDate(check_in)}\n`;
+    msg += `📅 *Check-out:* ${UI.formatDate(check_out)}\n`;
+    msg += `👥 *Guests:* ${guests}\n`;
+    msg += `👤 *Name:* ${guest_name}\n`;
+    
+    if (method === 'qr_paid') {
+      const nights = Math.round((new Date(check_out) - new Date(check_in)) / 86400000);
+      const total = (nights || 1) * this.selectedRoom.price;
+      msg += `💰 *Amount Paid:* ${CONFIG.CURRENCY} ${total.toFixed(2)}\n`;
+      msg += `\n(I will send the receipt as an attachment next)\n`;
+    }
+
+    if (special) msg += `\n📝 *Special Requests:* ${special}`;
 
     const encodedMsg = encodeURIComponent(msg);
-    // Netfly redirection – forwards to WhatsApp with prefilled message
     const netflyUrl = `https://netfly.app/redirect?url=${encodeURIComponent('https://wa.me/60146178993?text=' + encodedMsg)}`;
     
     window.open(netflyUrl, '_blank');
