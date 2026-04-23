@@ -701,53 +701,67 @@
     margin-left: 1.5rem;
   }
   .lang-btn {
-    background: transparent;
-    border: 1px solid rgba(212,168,83,0.3);
-    color: var(--mid-brown);
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
+    background: white;
+    border: 1px solid rgba(93, 64, 55, 0.1);
+    color: var(--deep-brown);
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
   }
   .lang-btn:hover {
-    border-color: var(--sage);
-    color: var(--sage);
+    border-color: var(--gold);
+    box-shadow: 0 6px 20px rgba(212,168,83,0.15);
+    transform: translateY(-1px);
   }
   .lang-dropdown {
     position: absolute;
-    top: 110%;
+    top: calc(100% + 12px);
     right: 0;
     background: white;
-    box-shadow: 0 10px 30px rgba(62, 39, 35, 0.15);
-    border-radius: 10px;
-    padding: 0.5rem;
+    box-shadow: 0 15px 45px rgba(62, 39, 35, 0.15);
+    border-radius: 16px;
+    padding: 0.8rem;
     display: none;
     grid-template-columns: 1fr;
-    min-width: 140px;
+    min-width: 160px;
     z-index: 1000;
     border: 1px solid rgba(212,168,83,0.1);
+    animation: langSlide .3s ease;
+  }
+  @keyframes langSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .lang-dropdown.show { display: grid; }
   .lang-option {
-    padding: 0.6rem 1rem;
+    padding: 0.7rem 1.2rem;
     font-size: 0.85rem;
     color: var(--mid-brown);
     text-decoration: none;
-    border-radius: 6px;
-    transition: background 0.2s;
+    border-radius: 8px;
+    transition: all 0.2s;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem;
+    font-weight: 500;
+  }
+  .lang-option span { 
+    font-weight: 700; color: var(--gold); font-size: 0.75rem; 
+    min-width: 25px;
   }
   .lang-option:hover {
-    background: var(--cream);
-    color: var(--sage);
+    background: var(--warm-white);
+    color: var(--gold);
+    padding-left: 1.5rem;
+  }
   }
   .lang-option.active {
     background: var(--sage);
