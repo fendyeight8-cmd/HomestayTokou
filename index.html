@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Homestay Tokou — Authentic Malaysian Retreat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #F4F1EA;
@@ -31,7 +31,7 @@
   html { scroll-behavior: smooth; scroll-padding-top: 100px; }
 
   body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', sans-serif;
     background: var(--warm-white);
     color: var(--deep-brown);
     overflow-x: hidden;
@@ -41,46 +41,59 @@
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.2rem 4rem;
-    background: rgba(253,250,244,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(212,168,83,0.2);
-    transition: box-shadow .3s;
+    padding: 1.5rem 5rem;
+    background: rgba(252, 251, 248, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(212, 168, 83, 0.15);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   }
-  nav.scrolled { box-shadow: 0 4px 30px var(--shadow); }
+  nav.scrolled { 
+    padding: 1rem 5rem;
+    background: rgba(252, 251, 248, 0.95);
+    box-shadow: 0 10px 40px rgba(62, 39, 35, 0.08);
+  }
 
   .nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--deep-brown);
     text-decoration: none;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+    display: flex; align-items: center; gap: 0.2rem;
   }
   .nav-logo span { color: var(--gold); }
 
-  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links { display: flex; align-items: center; gap: 3rem; list-style: none; }
   .nav-links a {
-    font-size: .9rem; font-weight: 500; letter-spacing: .5px;
-    color: var(--mid-brown); text-decoration: none; text-transform: uppercase;
-    transition: color .2s;
+    font-size: .85rem; font-weight: 600; letter-spacing: 1.5px;
+    color: var(--deep-brown); text-decoration: none; text-transform: uppercase;
+    transition: all .3s;
     position: relative;
-    padding: 0.5rem 0;
+    padding: 0.3rem 0;
   }
   .nav-links a::after {
-    content: ''; position: absolute; bottom: 0; left: 0;
-    width: 0%; height: 2px; background: var(--sage);
-    transition: width .3s ease;
+    content: ''; position: absolute; bottom: 0; left: 50%;
+    width: 0%; height: 1.5px; background: var(--gold);
+    transition: all .3s ease;
+    transform: translateX(-50%);
   }
   .nav-links a:hover::after { width: 100%; }
-  .nav-links a:hover { color: var(--sage); }
+  .nav-links a:hover { color: var(--gold); }
 
   .nav-cta {
     background: var(--sage); color: white !important;
-    padding: .65rem 1.6rem; border-radius: 8px;
-    transition: background .2s !important;
+    padding: .8rem 2rem; border-radius: 4px;
+    font-size: 0.8rem !important;
+    box-shadow: 0 4px 15px rgba(78, 110, 82, 0.2);
+    transition: all 0.3s !important;
   }
-  .nav-cta:hover { background: var(--deep-brown) !important; color: white !important; }
+  .nav-cta:hover { 
+    background: var(--deep-brown) !important; 
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(62, 39, 35, 0.3);
+  }
 
   /* ── HERO ── */
   .hero {
@@ -133,7 +146,7 @@
   }
 
   .hero h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: clamp(3rem, 7vw, 6rem);
     color: var(--cream);
     line-height: 1.1;
@@ -246,7 +259,7 @@
     color: var(--copper); font-weight: 600; margin-bottom: .8rem;
   }
   .section-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: clamp(2rem, 4vw, 3rem);
     color: var(--deep-brown); line-height: 1.2;
     margin-bottom: 1rem;
@@ -310,7 +323,7 @@
     color: var(--mid-brown); font-weight: 700; margin-bottom: .4rem;
   }
   .room-name {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.4rem; color: var(--deep-brown); margin-bottom: .8rem;
     line-height: 1.2;
   }
@@ -389,7 +402,7 @@
     display: flex; justify-content: space-between; align-items: flex-start;
   }
   .modal-header h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.5rem; color: var(--cream);
   }
   .modal-header p { font-size: .85rem; color: var(--gold); margin-top: .2rem; }
@@ -451,7 +464,7 @@
     font-size: 2rem;
   }
   .confirm-ref {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 2rem; color: var(--deep-brown); letter-spacing: 2px;
     margin: .5rem 0 1.5rem;
   }
@@ -493,7 +506,7 @@
     transform: scale(1.08);
   }
   .feature-card h3 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.4rem; margin-bottom: .8rem;
     color: var(--deep-brown);
   }
@@ -520,7 +533,7 @@
     border: 1px solid rgba(212,168,83,0.1);
   }
   .rating-num {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 4.5rem; line-height: 1; color: var(--deep-brown);
     font-weight: 700;
   }
@@ -602,7 +615,7 @@
   .footer-brand .nav-logo { display: inline-block; margin-bottom: 1rem; }
   .footer-brand p { font-size: .9rem; line-height: 1.7; }
   footer h4 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     color: var(--cream); font-size: 1rem; margin-bottom: 1rem;
   }
   footer ul { list-style: none; }
@@ -784,16 +797,15 @@
     <li><a href="#rooms" class="nav-cta" data-t="nav_book_now">Book Now</a></li>
     <li class="lang-selector">
       <button class="lang-btn" onclick="toggleLangDropdown()">
-        <span id="current-lang-flag">🇬🇧</span>
-        <span id="current-lang-label">EN</span>
+        <span id="current-lang-flag">EN</span>
       </button>
       <div class="lang-dropdown" id="lang-dropdown">
-        <div class="lang-option active" onclick="setLanguage('en')"><span>🇬🇧</span> English</div>
-        <div class="lang-option" onclick="setLanguage('ms')"><span>🇲🇾</span> Malay</div>
-        <div class="lang-option" onclick="setLanguage('zh')"><span>🇨🇳</span> Chinese</div>
-        <div class="lang-option" onclick="setLanguage('in')"><span>🇮🇳</span> Indian</div>
-        <div class="lang-option" onclick="setLanguage('ko')"><span>🇰🇷</span> Korean</div>
-        <div class="lang-option" onclick="setLanguage('fr')"><span>🇫🇷</span> French</div>
+        <div class="lang-option active" onclick="setLanguage('en')"><span>EN</span> English</div>
+        <div class="lang-option" onclick="setLanguage('ms')"><span>MY</span> Malay</div>
+        <div class="lang-option" onclick="setLanguage('zh')"><span>CN</span> Chinese</div>
+        <div class="lang-option" onclick="setLanguage('in')"><span>IN</span> Indian</div>
+        <div class="lang-option" onclick="setLanguage('ko')"><span>KR</span> Korean</div>
+        <div class="lang-option" onclick="setLanguage('fr')"><span>FR</span> French</div>
       </div>
     </li>
   </ul>
@@ -996,7 +1008,7 @@ const LangService = {
   
   translations: {
     en: {
-      flag: '🇬🇧', label: 'EN',
+      flag: 'EN', label: 'EN',
       nav_rooms: "Rooms", nav_about: "About", nav_reviews: "Reviews", nav_booking: "My Booking", nav_book_now: "Book Now",
       hero_badge: "Authentic Sabahan Retreat", hero_title: "Homestay<br><em>Tokou</em>", hero_p: "Immerse yourself in the raw beauty of North Borneo, where traditional Sabahan hospitality meets the tranquil outskirts of Beluran's lush wilderness.",
       hero_btn_rooms: "Explore Rooms", hero_btn_about: "Our Story", hero_scroll: "Scroll",
@@ -1013,7 +1025,7 @@ const LangService = {
       room_night: "/ night", btn_book_now: "Book Now", btn_unavailable: "Unavailable", badge_available: "✓ Available", badge_booked: "✗ Booked"
     },
     ms: {
-      flag: '🇲🇾', label: 'MS',
+      flag: 'MY', label: 'MS',
       nav_rooms: "Bilik", nav_about: "Tentang", nav_reviews: "Ulasan", nav_booking: "Tempahan", nav_book_now: "Tempah",
       hero_badge: "Percutian Autentik Sabah", hero_title: "Inap Desa<br><em>Tokou</em>", hero_p: "Alami keindahan asli Borneo Utara, di mana kemesraan hospitaliti tradisi Sabah bertemu dengan ketenangan alam semula jadi di pinggir Beluran.",
       hero_btn_rooms: "Lihat Bilik", hero_btn_about: "Kisah Kami", hero_scroll: "Skrol",
@@ -1030,7 +1042,7 @@ const LangService = {
       room_night: "/ malam", btn_book_now: "Tempah Sekarang", btn_unavailable: "Penuh", badge_available: "✓ Tersedia", badge_booked: "✗ Habis"
     },
     zh: {
-      flag: '🇨🇳', label: 'ZH',
+      flag: 'CN', label: 'ZH',
       nav_rooms: "客房", nav_about: "关于", nav_reviews: "评价", nav_booking: "我的预订", nav_book_now: "立即预订",
       hero_badge: "正宗马来西亚度假胜地", hero_title: "Tokou<br><em>民宿</em>", hero_p: "在自然中心体验传统马来西亚款待的热情。",
       hero_btn_rooms: "探索客房", hero_btn_about: "我们的故事", hero_scroll: "滚动",
@@ -1047,7 +1059,7 @@ const LangService = {
       room_night: "/ 每晚", btn_book_now: "立即预订", btn_unavailable: "已满", badge_available: "✓ 有房", badge_booked: "✗ 已满"
     },
     in: {
-      flag: '🇮🇳', label: 'IN',
+      flag: 'IN', label: 'IN',
       nav_rooms: "அறைகள்", nav_about: "பற்றி", nav_reviews: "மதிப்புரைகள்", nav_booking: "எனது முன்பதிவு", nav_book_now: "முன்பதிவு",
       hero_badge: "அசல் மலேசிய தங்குமிடம்", hero_title: "தங்குமிடம்<br><em>Tokou</em>", hero_p: "இயற்கையின் இதயத்தில் மலேசிய விருந்தோம்பலின் வெப்பத்தை அனுபவிக்கவும்.",
       hero_btn_rooms: "அறைகளை ஆராயுங்கள்", hero_btn_about: "எங்கள் கதை", hero_scroll: "உருட்டவும்",
@@ -1064,7 +1076,7 @@ const LangService = {
       room_night: "/ இரவு", btn_book_now: "இப்போது பதிவு செய்யுங்கள்", btn_unavailable: "இல்லை", badge_available: "✓ உள்ளது", badge_booked: "✗ இல்லை"
     },
     ko: {
-      flag: '🇰🇷', label: 'KO',
+      flag: 'KR', label: 'KO',
       nav_rooms: "객실", nav_about: "소개", nav_reviews: "후기", nav_booking: "예약 확인", nav_book_now: "지금 예약",
       hero_badge: "진정한 말레이시아 휴양지", hero_title: "홈스테이<br><em>Tokou</em>", hero_p: "자연의 품 안에서 전통 말레이시아 환대의 따뜻함을 경험해 보세요.",
       hero_btn_rooms: "객실 둘러보기", hero_btn_about: "우리의 이야기", hero_scroll: "스크롤",
@@ -1081,7 +1093,7 @@ const LangService = {
       room_night: "/ 1박", btn_book_now: "지금 예약", btn_unavailable: "예약 불가", badge_available: "✓ 예약 가능", badge_booked: "✗ 예약 완료"
     },
     fr: {
-      flag: '🇫🇷', label: 'FR',
+      flag: 'FR', label: 'FR',
       nav_rooms: "Chambres", nav_about: "À Propos", nav_reviews: "Avis", nav_booking: "Mes Réservations", nav_book_now: "Réserver",
       hero_badge: "Retraite Malaise Authentique", hero_title: "Homestay<br><em>Tokou</em>", hero_p: "Découvrez la chaleur de l'hospitalité malaise traditionnelle au cœur de la nature.",
       hero_btn_rooms: "Explorer", hero_btn_about: "Notre Histoire", hero_scroll: "Défiler",
