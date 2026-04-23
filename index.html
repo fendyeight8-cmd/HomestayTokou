@@ -1385,9 +1385,9 @@ const App = {
     if (special) msg += `\n📝 *Special Requests:* ${special}`;
 
     const encodedMsg = encodeURIComponent(msg);
-    const netflyUrl = `https://netfly.app/redirect?url=${encodeURIComponent('https://wa.me/60146178993?text=' + encodedMsg)}`;
+    const whatsappUrl = `https://wa.me/60146178993?text=${encodedMsg}`;
     
-    window.open(netflyUrl, '_blank');
+    window.open(whatsappUrl, '_blank');
     this.closeBooking();
   },
 
