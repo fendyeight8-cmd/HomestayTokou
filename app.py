@@ -376,22 +376,20 @@ class HomestayHandler(BaseHTTPRequestHandler):
             if path.rstrip('/') == '/api/settings/update': return self.send_json(*handle_update_setting(data))
             
             if path == '/api/upload':
-                return self.handle_upload()
+                return self.handle_upload(post_data)
 
             self.send_json(*json_response({"error": "Not found"}, 404))
         except Exception as e:
             logger.error(f"Error handling POST {path}: {e}")
             self.send_json(*json_response({"error": "Internal server error"}, 500))
 
-    def handle_upload(self):
+    def handle_upload(self, body):
         try:
             content_type = self.headers.get('Content-Type')
             if not content_type or 'multipart/form-data' not in content_type:
                 return self.send_json(*json_response({"error": "Invalid Content-Type"}, 400))
             
             boundary = content_type.split("boundary=")[1].encode()
-            content_length = int(self.headers.get('Content-Length'))
-            body = self.rfile.read(content_length)
             
             # More robust multipart parsing
             parts = body.split(b'--' + boundary)

@@ -549,30 +549,112 @@
                 <div class="dash-header">
                     <div class="dash-title">
                         <h1>Site Settings</h1>
-                        <p>Configure business details and payment methods.</p>
+                        <p>Manage booking contact, payment details, QR code, and public website configuration.</p>
+                    </div>
+                    <div class="dash-actions">
+                        <span class="badge badge-success" style="padding: 0.6rem 1rem;"><i class="fa-solid fa-circle-check"></i> Business Settings Active</span>
+                        <a href="/" target="_blank" class="btn-primary" style="background:var(--mid-brown); border-color:var(--mid-brown); text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-eye"></i> View Website</a>
                     </div>
                 </div>
-                <div class="widget-container" style="max-width: 800px;">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label style="font-weight:600; color:var(--deep-brown);">Business WhatsApp</label>
-                            <input type="text" id="set-whatsapp" placeholder="+60123456789" style="width:100%; padding:0.8rem; border:1px solid var(--border); border-radius:8px; margin-top:0.5rem;">
-                            <button class="btn-primary" style="margin-top: 1rem" onclick="Admin.saveSetting('whatsapp')">Save Number</button>
+
+                <!-- KPI Cards for Settings -->
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">WhatsApp Number</span>
+                            <div class="stat-value" style="font-size: 1.5rem;" id="set-kpi-wa-val">-</div>
+                            <div class="stat-trend" id="set-kpi-wa">Loading...</div>
                         </div>
-                        <div class="form-group">
-                            <label style="font-weight:600; color:var(--deep-brown);">Payment QR Code</label>
-                            <div style="margin-top:0.5rem; display:flex; align-items:flex-start; gap:1.5rem;">
-                                <div style="width:150px; height:150px; background:var(--cream); border-radius:12px; border:1px dashed var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden;">
-                                    <img id="qr-preview" class="qr-preview" src="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" style="max-width:100%; max-height:100%;">
-                                    <div style="color:var(--mid-brown); text-align:center; display:none;"><i class="fa-solid fa-qrcode" style="font-size:2rem; margin-bottom:0.5rem;"></i><br><small>No QR Code</small></div>
+                        <div class="stat-icon" style="color:var(--sage); background:rgba(61,90,64,0.1);"><i class="fa-brands fa-whatsapp"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Payment QR</span>
+                            <div class="stat-value" style="font-size: 1.5rem;">DuitNow</div>
+                            <div class="stat-trend" id="set-kpi-qr">Loading...</div>
+                        </div>
+                        <div class="stat-icon" style="color:var(--gold); background:rgba(191,155,48,0.1);"><i class="fa-solid fa-qrcode"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Booking Channel</span>
+                            <div class="stat-value" style="font-size: 1.5rem;">Direct</div>
+                            <div class="stat-trend" id="set-kpi-chan" style="color:var(--sage);">Loading...</div>
+                        </div>
+                        <div class="stat-icon" style="color:var(--deep-brown); background:var(--cream);"><i class="fa-solid fa-calendar-check"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Payment Method</span>
+                            <div class="stat-value" style="font-size: 1.5rem;">Manual</div>
+                            <div class="stat-trend" id="set-kpi-pay">Loading...</div>
+                        </div>
+                        <div class="stat-icon" style="color:var(--deep-brown); background:var(--cream);"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    </div>
+                </div>
+
+                <!-- 2-Column Settings Layout -->
+                <div class="analytics-row" style="grid-template-columns: 1fr 1fr;">
+                    
+                    <!-- Left Column: WhatsApp Settings -->
+                    <div class="widget-container">
+                        <h3 style="display:flex; align-items:center; gap:0.5rem;"><i class="fa-brands fa-whatsapp" style="color:var(--sage);"></i> Booking Contact</h3>
+                        <p style="color:var(--mid-brown); font-size:0.9rem; margin-bottom:1.5rem; line-height:1.5;">This number is used for customer booking inquiries from the public website.</p>
+                        
+                        <div class="form-group" style="margin-top:auto;">
+                            <label style="font-weight:700; color:var(--deep-brown);">Business WhatsApp Number</label>
+                            <input type="text" id="set-whatsapp" placeholder="+60123456789" style="width:100%; padding:0.9rem 1rem; border:1.5px solid var(--border); border-radius:8px; margin-top:0.5rem; font-size:1rem;">
+                            <p style="font-size:0.8rem; color:var(--mid-brown); margin-top:0.5rem; margin-bottom:1.5rem;">Use international format starting with +, for example: +60110085626.</p>
+                            
+                            <p id="wa-error-msg" style="color:var(--terracotta); font-size:0.85rem; margin-bottom:1rem; display:none;"><i class="fa-solid fa-circle-exclamation"></i> Must start with + followed by numbers.</p>
+                            <p id="wa-success-msg" style="color:var(--sage); font-size:0.85rem; margin-bottom:1rem; display:none;"><i class="fa-solid fa-circle-check"></i> Number saved successfully.</p>
+                            
+                            <button class="btn-primary" style="width:100%; padding:1rem; font-size:1rem;" onclick="Admin.saveSetting('whatsapp')"><i class="fa-solid fa-floppy-disk"></i> Save Number</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: QR Settings -->
+                    <div class="widget-container">
+                        <h3 style="display:flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-qrcode" style="color:var(--gold);"></i> Payment QR Code</h3>
+                        <p style="color:var(--mid-brown); font-size:0.9rem; margin-bottom:1.5rem; line-height:1.5;">Upload the QR code customers will use for payment confirmation.</p>
+                        
+                        <div style="display:flex; gap:2rem; align-items:flex-start; margin-top:auto;">
+                            <!-- QR Preview Box -->
+                            <div style="width:180px; height:180px; background:var(--cream); border-radius:16px; border:2px dashed var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; position:relative; flex-shrink:0;">
+                                <img id="qr-preview" class="qr-preview" src="" style="width:100%; height:100%; object-fit:contain; margin:0; border:none; display:none; background:white;">
+                                <div id="qr-empty-state" style="color:var(--mid-brown); text-align:center; display:flex; flex-direction:column; align-items:center; padding:1rem;">
+                                    <i class="fa-solid fa-qrcode" style="font-size:2.5rem; margin-bottom:0.8rem; opacity:0.5;"></i>
+                                    <span style="font-size:0.85rem; font-weight:600;">No QR Uploaded</span>
                                 </div>
+                            </div>
+                            
+                            <!-- Upload Controls -->
+                            <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; height:180px;">
                                 <div style="position: relative; overflow: hidden; display: inline-block;">
-                                    <button class="btn-gold"><i class="fa-solid fa-upload"></i> Upload New QR</button>
-                                    <input type="file" onchange="Admin.handleFileUpload('qr', 0, this)" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%">
-                                    <p style="font-size:0.8rem; color:var(--mid-brown); margin-top:0.5rem;">Supported formats: JPG, PNG.<br>Max size: 2MB.</p>
+                                    <button class="btn-gold" style="width:100%; margin-bottom:1rem;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload New QR</button>
+                                    <input type="file" accept="image/jpeg, image/png, image/webp" onchange="Admin.handleFileUpload('qr', 0, this)" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%">
+                                </div>
+                                <button class="btn-primary" id="btn-remove-qr" style="background:transparent; color:var(--terracotta); border:1px solid rgba(166,75,42,0.3); width:100%; display:none;" onclick="Admin.removeQR()"><i class="fa-solid fa-trash-can"></i> Remove QR</button>
+                                
+                                <div style="margin-top:auto; background:#fdfdfd; padding:0.8rem; border-radius:8px; border:1px solid var(--border);">
+                                    <p style="font-size:0.75rem; color:var(--mid-brown); margin:0;">
+                                        <strong>Supported:</strong> JPG, PNG, WEBP<br>
+                                        <strong>Max size:</strong> 2MB
+                                    </p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Payment Instructions -->
+                <div class="widget-container" style="margin-bottom:2rem;">
+                    <h3>Payment Instructions</h3>
+                    <div style="background:#faf8f5; padding:1.5rem; border-radius:12px; border:1px solid var(--border);">
+                        <p style="color:var(--deep-brown); line-height:1.6; font-size:0.95rem; margin:0;">
+                            <i class="fa-solid fa-circle-info" style="color:var(--sage); margin-right:0.5rem;"></i>
+                            <strong>Public Display Note:</strong> After submitting a booking inquiry, guests may complete payment using the QR code (if uploaded) and are instructed to send proof of payment via WhatsApp to the configured business number.
+                        </p>
                     </div>
                 </div>
             </section>
@@ -1053,16 +1135,107 @@
             },
 
             async loadSettings() {
-                const res = await fetch('/api/settings');
-                const s = await res.json();
-                document.getElementById('set-whatsapp').value = s.whatsapp || '';
-                document.getElementById('qr-preview').src = s.qr_code || '';
+                try {
+                    const res = await fetch('/api/settings');
+                    const s = await res.json();
+                    
+                    const waInput = document.getElementById('set-whatsapp');
+                    const qrPreview = document.getElementById('qr-preview');
+                    const qrEmpty = document.getElementById('qr-empty-state');
+                    const btnRemoveQR = document.getElementById('btn-remove-qr');
+                    
+                    if (waInput) waInput.value = s.whatsapp || '';
+                    
+                    // Update KPI WhatsApp
+                    if (s.whatsapp) {
+                        document.getElementById('set-kpi-wa-val').textContent = s.whatsapp;
+                        document.getElementById('set-kpi-wa').innerHTML = '<i class="fa-solid fa-check" style="color:var(--sage)"></i> Configured';
+                        document.getElementById('set-kpi-chan').innerHTML = 'WhatsApp Enabled';
+                    } else {
+                        document.getElementById('set-kpi-wa-val').textContent = '-';
+                        document.getElementById('set-kpi-wa').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--terracotta)"></i> Missing';
+                        document.getElementById('set-kpi-chan').innerHTML = '<span style="color:var(--terracotta)">Pending Setup</span>';
+                    }
+
+                    // Update KPI QR
+                    if (s.qr_code && s.qr_code.trim() !== '') {
+                        let imgPath = s.qr_code.startsWith('uploads') ? `/${s.qr_code}` : `/images/${s.qr_code}`;
+                        imgPath += '?t=' + new Date().getTime(); // Prevent caching issues
+                        if (qrPreview) {
+                            qrPreview.src = imgPath;
+                            qrPreview.style.display = 'block';
+                        }
+                        if (qrEmpty) qrEmpty.style.display = 'none';
+                        if (btnRemoveQR) btnRemoveQR.style.display = 'block';
+                        
+                        document.getElementById('set-kpi-qr').innerHTML = '<i class="fa-solid fa-check" style="color:var(--sage)"></i> Uploaded';
+                        document.getElementById('set-kpi-pay').innerHTML = 'QR Payment Enabled';
+                    } else {
+                        if (qrPreview) qrPreview.style.display = 'none';
+                        if (qrEmpty) qrEmpty.style.display = 'flex';
+                        if (btnRemoveQR) btnRemoveQR.style.display = 'none';
+                        
+                        document.getElementById('set-kpi-qr').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--terracotta)"></i> Missing';
+                        document.getElementById('set-kpi-pay').innerHTML = '<span style="color:var(--terracotta)">Pending Setup</span>';
+                    }
+                } catch (e) {
+                    console.error("Failed to load settings:", e);
+                }
             },
 
             async saveSetting(k) {
-                const v = document.getElementById('set-whatsapp').value;
-                await fetch('/api/settings/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: k, value: v }) });
-                alert('Setting Synchronized.');
+                if (k === 'whatsapp') {
+                    const waInput = document.getElementById('set-whatsapp');
+                    const err = document.getElementById('wa-error-msg');
+                    const suc = document.getElementById('wa-success-msg');
+                    err.style.display = 'none';
+                    suc.style.display = 'none';
+                    
+                    let val = waInput.value.trim();
+                    if (!val) {
+                        err.textContent = "WhatsApp number is required.";
+                        err.style.display = 'block';
+                        return;
+                    }
+                    if (!val.startsWith('+') || !/^\+[0-9]{8,15}$/.test(val)) {
+                        err.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Must start with + followed by numbers only (8-15 digits).';
+                        err.style.display = 'block';
+                        return;
+                    }
+                    
+                    try {
+                        const res = await fetch('/api/settings/update', { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
+                            body: JSON.stringify({ key: k, value: val }) 
+                        });
+                        if (res.ok) {
+                            suc.style.display = 'block';
+                            setTimeout(() => { suc.style.display = 'none'; }, 3000);
+                            this.loadSettings();
+                        } else {
+                            err.textContent = "Failed to save to server.";
+                            err.style.display = 'block';
+                        }
+                    } catch (e) {
+                        err.textContent = "Connection error.";
+                        err.style.display = 'block';
+                    }
+                }
+            },
+
+            async removeQR() {
+                if (!confirm('Are you sure you want to remove the payment QR code?')) return;
+                try {
+                    await fetch('/api/settings/update', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ key: 'qr_code', value: '' }) 
+                    });
+                    this.loadSettings();
+                } catch (e) {
+                    alert('Error removing QR code.');
+                }
             },
 
             editingRoomId: null,
@@ -1195,6 +1368,41 @@
                         btn.disabled = false;
                         btn.innerHTML = this.editingRoomId ? 'Save Changes' : 'Create Room';
                     }
+                }
+            },
+
+            async handleFileUpload(type, id, input) {
+                if (!input.files || input.files.length === 0) return;
+                
+                const file = input.files[0];
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!validTypes.includes(file.type)) return alert('Invalid file type. Only JPG, PNG, and WEBP are allowed.');
+                if (file.size > 2 * 1024 * 1024) return alert('File too large. Maximum size is 2MB.');
+
+                const fd = new FormData();
+                fd.append('file', file);
+                
+                try {
+                    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        if (type === 'qr') {
+                            await fetch('/api/settings/update', { 
+                                method: 'POST', 
+                                headers: { 'Content-Type': 'application/json' }, 
+                                body: JSON.stringify({ key: 'qr_code', value: data.path }) 
+                            });
+                            alert('QR Code successfully uploaded.');
+                        }
+                        Admin.loadSettings();
+                    } else {
+                        alert('Upload failed: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (e) {
+                    alert('An error occurred during upload.');
+                } finally {
+                    input.value = ''; // Reset the input so the same file can be uploaded again if needed
                 }
             },
 

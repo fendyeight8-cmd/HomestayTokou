@@ -2741,8 +2741,11 @@
       <div id="qr-payment-view" class="qr-container">
         <div class="qr-card">
           <h3 style="font-family:'Cormorant Garamond', serif; font-size:1.4rem; margin-bottom:1rem;">Scan & Pay Securely</h3>
-          <img src="${App.globalSettings?.qr_code || '/images/QR.png'}" alt="Payment QR" class="qr-image" onerror="this.src='https://placehold.co/220x220?text=Scan+to+Pay'">
-          <div class="summary-total" style="border:none; padding:0; justify-content:center; gap:0.5rem;">
+          ${App.globalSettings?.qr_code ? 
+            `<img src="${App.globalSettings.qr_code.startsWith('uploads') ? App.globalSettings.qr_code : '/images/' + App.globalSettings.qr_code}" alt="Payment QR" class="qr-image" onerror="this.src='https://placehold.co/220x220?text=Scan+to+Pay'">` :
+            `<div style="width:220px; height:220px; background:var(--cream); margin:0 auto; display:flex; align-items:center; justify-content:center; border:1px dashed var(--mid-brown); border-radius:12px; color:var(--mid-brown);"><i class="fa-solid fa-qrcode" style="font-size:2rem;"></i></div>`
+          }
+          <div class="summary-total" style="border:none; padding:0; justify-content:center; gap:0.5rem; margin-top:1rem;">
             <span style="font-size:0.9rem; font-weight:400;">Amount:</span>
             <span id="qr-total-display">${CONFIG.CURRENCY} ${total.toFixed(2)}</span>
           </div>
