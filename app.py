@@ -170,18 +170,14 @@ def handle_get_rooms(params: Dict[str, List[str]]) -> Tuple[int, bytes]:
     except (ValueError, TypeError):
         min_guests = 0
 
-<<<<<<< HEAD
     check_in = params.get('check_in', [None])[0]
     check_out = params.get('check_out', [None])[0]
 
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
     with Database(DB_PATH) as conn:
         query = "SELECT * FROM rooms WHERE capacity >= ? ORDER BY id ASC"
         rooms = rows_to_list(conn.execute(query, (min_guests,)).fetchall())
         
         for r in rooms:
-<<<<<<< HEAD
             if check_in and check_out:
                 # Check for conflicting bookings
                 # Overlap if: (existing_check_in < requested_check_out) AND (existing_check_out > requested_check_in)
@@ -194,9 +190,7 @@ def handle_get_rooms(params: Dict[str, List[str]]) -> Tuple[int, bytes]:
                 r['available'] = (conflicts == 0)
             else:
                 r['available'] = True
-=======
-            r['available'] = True
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
             r['amenities'] = r['amenities'].split(',') if r['amenities'] else []
 
     return json_response(rooms)

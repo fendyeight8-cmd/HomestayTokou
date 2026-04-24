@@ -54,27 +54,28 @@
     nav {
       position: fixed;
       top: 1.5rem;
-      left: 4rem;
-      right: 4rem;
+      left: 2%;
+      right: 2%;
+      max-width: 96%;
+      margin: 0 auto;
       z-index: 100;
-      padding: 0.8rem 2.5rem;
+      padding: 1.2rem 3rem;
       display: flex;
       align-items: center;
       background: rgba(78, 110, 82, 0.85); /* Theme Sage Glass */
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-radius: 50px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 15px 35px rgba(62, 39, 35, 0.1);
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 15px 45px rgba(62, 39, 35, 0.1);
       transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
     nav.scrolled {
-      top: 0.8rem;
-      left: 2rem;
-      right: 2rem;
-      background: rgba(62, 39, 35, 0.95); /* Deep Brown on Scroll */
-      padding: 0.6rem 2rem;
+      top: 1rem;
+      background: rgba(62, 39, 35, 0.95);
+      padding: 1rem 3.5rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     }
 
     .nav-logo {
@@ -204,11 +205,15 @@
 
     /* ── HERO ── */
     .hero {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       position: relative;
       background: var(--deep-brown);
+      padding: 120px 2rem 100px;
+      overflow: hidden;
     }
 
     .hero-bg-wrapper {
@@ -332,13 +337,14 @@
       animation: heroIn .9s ease .1s both;
     }
 
-    .hero h1 {
+     .hero h1 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3rem, 7vw, 6rem);
+      font-size: clamp(4rem, 8vw, 7.5rem);
       color: var(--cream);
-      line-height: 1.1;
-      margin-bottom: 1rem;
+      line-height: 0.95;
+      margin-bottom: 1.5rem;
       animation: heroIn .9s ease .2s both;
+      text-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
 
     .hero h1 em {
@@ -347,12 +353,14 @@
     }
 
     .hero p {
-      color: rgba(245, 239, 224, .75);
-      font-size: 1.15rem;
-      font-weight: 300;
-      max-width: 520px;
-      margin: 0 auto 2.5rem;
+      color: var(--cream);
+      font-size: 1.25rem;
+      font-weight: 400;
+      max-width: 650px;
+      margin: 0 auto 3rem;
       animation: heroIn .9s ease .3s both;
+      line-height: 1.7;
+      opacity: 0.9;
     }
 
     .hero-btns {
@@ -423,28 +431,27 @@
     .quick-search {
       background: transparent;
       padding: 0 4rem;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      width: 100%;
       z-index: 20;
+      margin-top: -100px; /* Overlap effect without absolute positioning */
+      position: relative;
     }
 
     .search-card {
       background: var(--glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 16px;
-      padding: 2.5rem;
+      border-radius: 24px;
+      padding: 3rem 4rem;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 1.5rem;
+      gap: 2rem;
       align-items: end;
-      box-shadow: 0 30px 60px rgba(62, 39, 35, 0.15);
-      max-width: 1050px;
+      box-shadow: 0 40px 100px rgba(62, 39, 35, 0.2);
+      max-width: 1200px;
       margin: 0 auto;
-      transform: translateY(50%);
+      /* transform removed to keep natural flow with margin-top */
     }
 
     .search-card:hover {
@@ -467,15 +474,16 @@
 
     .form-group input,
     .form-group select {
-      border: 1.5px solid rgba(93, 64, 55, 0.15);
-      border-radius: 6px;
-      padding: .8rem 1rem;
-      font-family: 'Outfit', sans-serif;
-      font-size: .95rem;
+      border: 1.5px solid rgba(93, 64, 55, 0.12);
+      border-radius: 10px;
+      padding: 1.1rem 1.4rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
       color: var(--deep-brown);
       background: white;
-      transition: border-color .3s, box-shadow .3s;
+      transition: all .3s;
       outline: none;
+      width: 100%;
     }
 
     .form-group input:focus,
@@ -948,7 +956,6 @@
       min-height: 80px;
     }
 
-<<<<<<< HEAD
     /* ── STEPPER ── */
     .stepper {
       display: flex;
@@ -1054,8 +1061,6 @@
 
     .mt-1 { margin-top: 1rem; }
 
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
     /* ── CONFIRMATION ── */
     .confirmation {
       text-align: center;
@@ -1214,7 +1219,6 @@
       box-shadow: 0 20px 40px rgba(62, 39, 35, 0.1);
     }
 
-<<<<<<< HEAD
     /* ── QUICK BOOK LIST ── */
     .quick-book-list {
       display: flex;
@@ -1273,8 +1277,6 @@
       color: var(--sage);
     }
 
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
     .review-stars {
       color: var(--gold);
       margin-bottom: 1rem;
@@ -1494,14 +1496,148 @@
       }
     }
 
+    /* ── SKELETON ── */
+    .skeleton {
+      background: #f0f0f0;
+      background: linear-gradient(110deg, #f0f0f0 8%, #f8f8f8 18%, #f0f0f0 33%);
+      background-size: 200% 100%;
+      animation: 1.5s shine linear infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes shine {
+      from { background-position-x: 200%; }
+      to { background-position-x: -200%; }
+    }
+
+    .skeleton-card {
+      height: 450px;
+      width: 100%;
+    }
+
+    .skeleton-text {
+      height: 1rem;
+      width: 80%;
+      margin-bottom: 0.5rem;
+    }
+
+    .skeleton-review {
+      height: 150px;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    /* ── MENU TOGGLE ── */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      z-index: 1001;
+    }
+
+    .menu-toggle span {
+      width: 25px;
+      height: 2px;
+      background: var(--cream);
+      transition: 0.3s;
+      transform-origin: left;
+    }
+
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg);
+    }
+
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       nav {
+        top: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0;
         padding: 1rem 1.5rem;
       }
 
+      .menu-toggle {
+        display: flex;
+      }
+
       .nav-links {
-        display: none;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        height: 100vh;
+        background: white;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+        z-index: 1000;
+        display: flex;
+      }
+
+      .nav-links.open {
+        right: 0;
+      }
+
+      .nav-links .lang-selector {
+        margin-top: 1rem;
+      }
+
+      .modal {
+        width: 95vw;
+        max-width: none;
+        margin: 10px;
+        max-height: 85vh;
+      }
+
+      .stepper {
+        gap: 1.5rem;
+      }
+
+      .step-label {
+        display: none; /* Hide labels on very small screens to save space */
+      }
+
+      .step-num {
+        width: 28px;
+        height: 28px;
+      }
+
+      .hero {
+        min-height: 600px !important; /* Ensure enough height for content */
+        height: auto !important;
+        padding: 120px 1.5rem 0 !important;
+        display: block !important;
+        position: relative !important;
+      }
+      
+      .hero-content {
+        margin-bottom: 60px !important;
+        padding: 0 !important;
+        position: relative !important;
+        z-index: 10 !important;
+        opacity: 1 !important; /* Force visibility in case of animation issues */
+      }
+      
+      .hero-content > * {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
       }
 
       section {
@@ -1509,12 +1645,18 @@
       }
 
       .quick-search {
-        padding: 0 1.5rem 2rem;
+        padding: 0 1.5rem !important;
+        margin-top: 0 !important; /* Sit naturally after hero */
+        width: 100% !important;
+        position: relative !important;
+        z-index: 20 !important;
       }
 
       .search-card {
-        grid-template-columns: 1fr;
-        transform: translateY(-20px);
+        grid-template-columns: 1fr !important;
+        transform: translateY(-40px) !important; /* Slight overlap into hero base */
+        animation: none !important;
+        padding: 2rem 1.5rem !important;
       }
 
       .search-card .btn-primary {
@@ -1536,11 +1678,41 @@
 
       .booking-summary {
         grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 0.5rem;
+      }
+      
+      .summary-total {
+        margin-top: 1rem;
+        font-size: 1.1rem;
       }
 
       .rooms-header {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .qb-room-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .qb-pricing {
+        text-align: left;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .quick-book-list {
+        max-height: 50vh;
+        overflow-y: auto;
       }
     }
 
@@ -1682,7 +1854,7 @@
       color: var(--gold);
       padding-left: 1.5rem;
     }
-    }
+
 
     .lang-option.active {
       background: var(--sage);
@@ -1733,7 +1905,12 @@
   <!-- NAV -->
   <nav id="navbar">
     <a href="#" class="nav-logo">Homestay Tokou<span>.</span></a>
-    <ul class="nav-links">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu" onclick="App.toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
       <li><a href="#rooms" data-t="nav_rooms">Rooms</a></li>
       <li><a href="#about" data-t="nav_about">About</a></li>
       <li><a href="#reviews" data-t="nav_reviews">Reviews</a></li>
@@ -1771,10 +1948,11 @@
         <a href="#about" class="btn-outline" data-t="hero_btn_about">Our Story</a>
       </div>
     </div>
+  </section>
 
-    <!-- QUICK SEARCH MOVED INSIDE -->
-    <div class="quick-search">
-      <div class="search-card">
+  <!-- QUICK SEARCH -->
+  <div class="quick-search">
+    <div class="search-card">
         <div class="form-group">
           <label data-t="search_checkin">Check In</label>
           <input type="date" id="s-checkin" min="">
@@ -1794,11 +1972,8 @@
             <option value="6">6 Guests</option>
           </select>
         </div>
-<<<<<<< HEAD
         <button class="btn-primary" onclick="App.searchRooms()" style="white-space:nowrap;" data-t="search_btn">Check
-=======
-        <button class="btn-primary" onclick="searchRooms()" style="white-space:nowrap;" data-t="search_btn">Check
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
           Availability</button>
       </div>
     </div>
@@ -2130,11 +2305,7 @@
               },
 
               attachRevealObserver() {
-<<<<<<< HEAD
-=======
-                // This will be overwritten by App.attachRevealObserver if it exists,
-                // but we need it here for static elements during init.
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
                 const obs = new IntersectionObserver((entries) => {
                   entries.forEach(entry => {
                     if (entry.isIntersecting) entry.target.classList.add('active');
@@ -2164,6 +2335,8 @@
               },
 
               toggleModal(show) {
+                this.elements.modalOverlay.style.display = show ? 'grid' : 'none';
+                document.body.style.overflow = show ? 'hidden' : '';
                 this.elements.modalOverlay.classList.toggle('open', show);
               },
 
@@ -2204,22 +2377,15 @@
                     const wa = settings.whatsapp;
                     const display = document.getElementById('display-whatsapp');
                     if (display) display.textContent = wa;
-<<<<<<< HEAD
-=======
-                    // Update any WA links if they exist
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
                   }
+
                   if (settings.qr_code) {
                     const qr = document.getElementById('qr-image');
                     if (qr) qr.src = settings.qr_code;
                   }
-<<<<<<< HEAD
                   App.globalSettings = settings;
                 } catch (e) {}
-=======
-                  this.globalSettings = settings;
-                } catch (e) { console.error("Settings load failed", e); }
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
               },
 
               setupEventListeners() {
@@ -2228,14 +2394,19 @@
                 });
 
                 window.addEventListener('click', (e) => {
-<<<<<<< HEAD
                   if (e.target === UI.elements.modalOverlay) App.closeBooking();
-=======
-                  if (e.target === UI.elements.modalOverlay) this.closeBooking();
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
-                  if (!e.target.closest('.lang-selector')) {
+
+                  if (!e.target.closest('.lang-selector') && !e.target.closest('.menu-toggle')) {
                     document.getElementById('lang-dropdown')?.classList.remove('show');
+                    document.getElementById('nav-links')?.classList.remove('open');
                   }
+                });
+
+                // Close menu on link click
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                  link.addEventListener('click', () => {
+                    document.getElementById('nav-links')?.classList.remove('open');
+                  });
                 });
 
                 // 3D Tilt Logic
@@ -2292,12 +2463,10 @@
                   coInput.min = fmt(tom);
                   ciInput.value = fmt(today);
                   coInput.value = fmt(tom);
-<<<<<<< HEAD
                   
                   App.search.check_in = ciInput.value;
                   App.search.check_out = coInput.value;
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
                 }
               },
 
@@ -2305,25 +2474,44 @@
                 await Promise.all([this.loadRooms(), this.loadReviews()]);
               },
 
+              toggleMenu() {
+                const btn = document.getElementById('menu-toggle');
+                const links = document.getElementById('nav-links');
+                btn.classList.toggle('active');
+                links.classList.toggle('open');
+              },
+
+              renderSkeletons(container, type, count = 3) {
+                let html = '';
+                for (let i = 0; i < count; i++) {
+                  if (type === 'room') {
+                    html += `
+                      <div class="room-card">
+                        <div class="skeleton skeleton-card"></div>
+                        <div class="room-body">
+                          <div class="skeleton skeleton-text" style="width:30%"></div>
+                          <div class="skeleton skeleton-text" style="width:60%; height:1.5rem"></div>
+                          <div class="skeleton skeleton-text"></div>
+                          <div class="skeleton skeleton-text" style="width:90%"></div>
+                        </div>
+                      </div>`;
+                  } else {
+                    html += `<div class="skeleton skeleton-review"></div>`;
+                  }
+                }
+                container.innerHTML = html;
+              },
+
               async loadRooms() {
-                UI.setLoading(UI.elements.roomsGrid, 'Exploring availability…');
+                this.renderSkeletons(UI.elements.roomsGrid, 'room');
                 try {
                   const params = {};
-<<<<<<< HEAD
                   if (App.search.check_in) params.check_in = App.search.check_in;
                   if (App.search.check_out) params.check_out = App.search.check_out;
                   if (App.search.guests) params.guests = App.search.guests;
- 
+
                   App.allRooms = await ApiService.fetchRooms(params);
                   App.renderRooms(App.allRooms);
-=======
-                  if (this.search.check_in) params.check_in = this.search.check_in;
-                  if (this.search.check_out) params.check_out = this.search.check_out;
-                  if (this.search.guests) params.guests = this.search.guests;
-
-                  this.allRooms = await ApiService.fetchRooms(params);
-                  this.renderRooms(this.allRooms);
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
                 } catch (e) {
                   UI.elements.roomsGrid.innerHTML = `<p class="text-error" style="grid-column:1/-1;text-align:center">Unable to load rooms. Please refresh the page.</p>`;
                 }
@@ -2336,16 +2524,10 @@
                 }
 
                 const t = LangService.translations[LangService.current];
-<<<<<<< HEAD
                 UI.elements.roomsGrid.innerHTML = rooms.map(r => App.generateRoomCard(r, t)).join('');
 
                 App.attachRevealObserver();
-=======
-                UI.elements.roomsGrid.innerHTML = rooms.map(r => this.generateRoomCard(r, t)).join('');
 
-                // RE-ATTACH OBSERVER FOR DYNAMIC CARDS
-                this.attachRevealObserver();
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
               },
 
               attachRevealObserver() {
@@ -2364,15 +2546,10 @@
               },
 
               generateRoomCard(r, t) {
-<<<<<<< HEAD
                 const isBooked = !r.available && App.search.check_in;
                 const amenities = (r.amenities || []).filter(a => !['Private Balcony', 'Living Area', 'Private Pool'].includes(a)).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('');
                 const badge = (App.search.check_in && App.search.check_out)
-=======
-                const isBooked = !r.available && this.search.check_in;
-                const amenities = (r.amenities || []).filter(a => !['Private Balcony', 'Living Area', 'Private Pool'].includes(a)).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('');
-                const badge = (this.search.check_in && this.search.check_out)
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
                   ? `<span class="room-avail ${r.available ? 'avail-yes' : 'avail-no'}">${r.available ? t.badge_available : t.badge_booked}</span>` : '';
 
                 let imageSource = null;
@@ -2406,6 +2583,7 @@
               },
 
               async loadReviews() {
+                this.renderSkeletons(UI.elements.reviewsGrid, 'review', 4);
                 try {
                   const data = await ApiService.fetchReviews();
                   document.getElementById('avg-rating').textContent = data.average_rating;
@@ -2417,7 +2595,7 @@
           <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
           <p class="review-text">"${r.comment}"</p>
           <p class="review-author">${r.guest_name}</p>
-          <p class="review-date">${new Date(r.created_at).toLocaleDateString(CONFIG.DATE_LOCALE, { year: 'numeric', month: 'long' })}</p>
+          <p class="review-date">${ new Date(r.created_at).toLocaleDateString(CONFIG.DATE_LOCALE, { year: 'numeric', month: 'long' }) }</p>
         </div>`).join('');
                 } catch (e) {
                   UI.elements.reviewsGrid.innerHTML = `<p style="color:var(--mid-brown)">Reviews currently unavailable.</p>`;
@@ -2433,7 +2611,6 @@
                 if (!ci || !co) { UI.showToast('Select your dates first.', 'error'); return; }
                 if (ci >= co) { UI.showToast('Check-out must be after check-in.', 'error'); return; }
 
-<<<<<<< HEAD
                 App.search = { check_in: ci, check_out: co, guests: g };
                 
                 // Open modal with professional loading state instead of scrolling
@@ -2450,18 +2627,13 @@
                 }).catch(e => {
                   UI.elements.modalBody.innerHTML = `<p style="text-align:center; padding:2rem;">Connection issue. Please try again.</p>`;
                 });
-=======
-                this.search = { check_in: ci, check_out: co, guests: g };
-                document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' });
-                this.loadRooms();
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
 
                 const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
                 document.getElementById('rooms-subtitle').textContent =
                   `${nights} night${nights > 1 ? 's' : ''} · ${g} guests · ${UI.formatDate(ci)} → ${UI.formatDate(co)}`;
               },
 
-<<<<<<< HEAD
               showQuickBookingView(rooms) {
                 const { check_in, check_out } = App.search;
                 const nights = Math.round((new Date(check_out) - new Date(check_in)) / 86400000);
@@ -2503,11 +2675,7 @@
               openBooking(room) {
                 App.selectedRoom = room;
                 const { check_in, check_out } = App.search;
-=======
-              openBooking(room) {
-                this.selectedRoom = room;
-                const { check_in, check_out } = this.search;
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
                 const nights = (check_in && check_out) ? Math.round((new Date(check_out) - new Date(check_in)) / 86400000) : 1;
                 const total = nights * room.price;
 
@@ -2518,7 +2686,6 @@
                 const co = check_out || new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
                 UI.elements.modalBody.innerHTML = `
-<<<<<<< HEAD
       <div class="stepper">
         <div class="step active" id="step-1">
           <div class="step-num">1</div>
@@ -2536,24 +2703,13 @@
           <div class="summary-item"><label>Check Out</label><p id="summary-co">${UI.formatDate(co)}</p></div>
           <div class="summary-item"><label>Duration</label><p><span id="summary-nights">${nights}</span> Nights</p></div>
           <div class="summary-total"><span>Total Payable</span><span id="summary-total">${CONFIG.CURRENCY} ${total.toFixed(2)}</span></div>
-=======
-      <div id="booking-form-view">
-        <div class="booking-summary" id="modal-summary">
-          <div class="summary-item"><label>Check In</label><p id="summary-ci">${UI.formatDate(ci)}</p></div>
-          <div class="summary-item"><label>Check Out</label><p id="summary-co">${UI.formatDate(co)}</p></div>
-          <div class="summary-item"><label>Nights</label><p id="summary-nights">${nights}</p></div>
-          <div class="summary-item"><label>Rate</label><p>${CONFIG.CURRENCY} ${room.price}</p></div>
-          <div class="summary-total"><span>Total</span><span id="summary-total">${CONFIG.CURRENCY} ${total.toFixed(2)}</span></div>
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
         </div>
         
         <div class="form-row">
           <div class="form-group">
-<<<<<<< HEAD
             <label>Nights</label>
-=======
-            <label>Duration (Nights)</label>
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
             <select id="b-duration" onchange="App.updateBookingDates()">
               ${[1, 2, 3, 4, 5, 6, 7, 10, 14].map(n => `<option value="${n}" ${n === nights ? 'selected' : ''}>${n} ${n > 1 ? 'Nights' : 'Night'}</option>`).join('')}
             </select>
@@ -2561,27 +2717,20 @@
           <div class="form-group">
             <label>Guests</label>
             <select id="b-guests">
-<<<<<<< HEAD
               ${Array.from({ length: room.capacity }, (_, i) => `<option value="${i + 1}" ${App.search.guests == i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}
-=======
-              ${Array.from({ length: room.capacity }, (_, i) => `<option value="${i + 1}" ${this.search.guests == i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
             </select>
           </div>
         </div>
 
         <div class="form-group">
           <label>Full Name *</label>
-<<<<<<< HEAD
           <input type="text" id="b-name" placeholder="E.g. Ahmad Faiz">
-=======
-          <input type="text" id="b-name" placeholder="John Doe">
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
         </div>
 
         <div class="form-group">
           <label>Special Requests</label>
-<<<<<<< HEAD
           <textarea id="b-special" rows="2" placeholder="Dietary needs, arrival time, etc."></textarea>
         </div>
         
@@ -2616,25 +2765,8 @@
           </ul>
         </div>
         <button class="btn-primary btn-block" onclick="App.closeBooking()">Close & Return Home</button>
-=======
-          <textarea id="b-special" rows="2"></textarea>
-        </div>
-        
-        <div class="booking-options">
-          <button class="btn-outline" onclick="App.submitBooking('whatsapp')" style="font-size:0.85rem; padding: 0.8rem 0.5rem; border-color: var(--sage); color: var(--sage);">Option 1: Chat with Owner</button>
-          <button class="btn-primary" onclick="App.showQRView()" style="font-size:0.85rem; padding: 0.8rem 0.5rem;">Option 2: Pay & Book</button>
-        </div>
-        <button id="shareBtn" class="btn-outline btn-block mt-1" style="border:none; color:var(--mid-brown); font-size:0.8rem; background:none;" onclick="App.shareBooking()">Share this stay</button>
       </div>
 
-      <div id="qr-payment-view" class="qr-container">
-        <h3 style="font-family:'Playfair Display', serif; margin-bottom:0.5rem;">Secure Payment</h3>
-        <p class="payment-instruction">Please scan the QR code below to make your payment of <strong id="qr-total-display">${CONFIG.CURRENCY} ${total.toFixed(2)}</strong>.</p>
-        <img src="${this.globalSettings?.qr_code || '/images/QR.png'}" alt="Payment QR Code" class="qr-image" onerror="this.src='https://placehold.co/200x200?text=Scan+to+Pay'">
-        <p class="payment-instruction" style="font-size:0.75rem;">Once payment is complete, click the button below to notify the owner via WhatsApp.</p>
-        <button class="btn-primary btn-block" onclick="App.submitBooking('qr_paid')">I Have Made Payment</button>
-        <button class="btn-outline btn-block mt-1" onclick="App.showFormView()" style="border:none;">Go Back</button>
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
       </div>
     `;
 
@@ -2656,37 +2788,29 @@
 
                 const qrTotal = document.getElementById('qr-total-display');
                 if (qrTotal) qrTotal.textContent = `${CONFIG.CURRENCY} ${total.toFixed(2)}`;
-<<<<<<< HEAD
-                
                 const qrConfirm = document.getElementById('qr-amount-confirm');
                 if (qrConfirm) qrConfirm.textContent = total.toFixed(2);
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
               },
 
               showQRView() {
                 const name = document.getElementById('b-name').value.trim();
                 if (!name) {
-<<<<<<< HEAD
                   UI.showToast('Please enter your name.', 'error');
-=======
-                  UI.showToast('Please enter your name before proceeding to payment.', 'error');
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
                   return;
                 }
                 document.getElementById('booking-form-view').style.display = 'none';
                 document.getElementById('qr-payment-view').classList.add('show');
-<<<<<<< HEAD
                 document.getElementById('step-1').classList.remove('active');
                 document.getElementById('step-2').classList.add('active');
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
+
+
               },
 
               showFormView() {
                 document.getElementById('booking-form-view').style.display = 'block';
                 document.getElementById('qr-payment-view').classList.remove('show');
-<<<<<<< HEAD
                 document.getElementById('booking-success-view').style.display = 'none';
                 document.getElementById('step-2').classList.remove('active');
                 document.getElementById('step-1').classList.add('active');
@@ -2697,9 +2821,10 @@
                 document.getElementById('qr-payment-view').classList.remove('show');
                 document.getElementById('booking-success-view').style.display = 'block';
                 document.querySelector('.stepper').style.display = 'none';
-=======
->>>>>>> c1da0055fba5b41ad29f76b9d0337dd9ee099b97
               },
+
+
+
 
               closeBooking() { UI.toggleModal(false); },
 
@@ -2722,27 +2847,33 @@
 
                 let msg = ``;
                 if (method === 'qr_paid') {
-                  msg = `*NEW BOOKING PAYMENT*\n\n`;
-                  msg += `I have completed the payment for my stay. Here are the details:\n\n`;
+                  msg += `🏡 *New Homestay Booking Payment*\n\n`;
+                  msg += `Hello, I have completed the payment for the following booking:\n\n`;
                 } else {
-                  msg = `*BOOKING INQUIRY*\n\n`;
-                  msg += `Hello, I would like to check availability for the following:\n\n`;
+                  msg += `🏡 *New Homestay Booking Inquiry*\n\n`;
+                  msg += `Hello, I would like to check the availability for the following booking:\n\n`;
                 }
 
-                msg += `• Room: ${this.selectedRoom.name}\n`;
-                msg += `• Check-in: ${UI.formatDate(ciVal)}\n`;
-                msg += `• Check-out: ${UI.formatDate(coVal)}\n`;
-                msg += `• Nights: ${nights}\n`;
-                msg += `• Guests: ${guests}\n`;
-                msg += `• Name: ${guest_name}\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+                msg += `📌 *Booking Details*\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                msg += `🛏️ *Room:* ${this.selectedRoom.name}\n`;
+                msg += `📅 *Check-in:* ${UI.formatDate(ciVal)}\n`;
+                msg += `📅 *Check-out:* ${UI.formatDate(coVal)}\n`;
+                msg += `🌙 *Total Nights:* ${nights} night${nights > 1 ? 's' : ''}\n`;
+                msg += `👥 *Guests:* ${guests} pax\n`;
+                msg += `👤 *Guest Name:* ${guest_name}\n\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
                 if (method === 'qr_paid') {
                   const total = nights * this.selectedRoom.price;
-                  msg += `• Total Paid: RM ${total.toFixed(2)}\n`;
-                  msg += `\n(I will send my payment receipt below)`;
+                  msg += `💰 *Total Paid:* RM ${total.toFixed(2)}\n`;
+                  msg += `\n(I will send my payment receipt below)\n\n`;
                 }
 
-                if (special) msg += `\n\n• Special Request: ${special}`;
+                if (special) msg += `📝 *Special Request:* ${special}\n\n`;
+
+                msg += `Please confirm if this room is available. Thank you.`;
 
                 const encodedMsg = encodeURIComponent(msg);
                 const waNumber = (this.globalSettings?.whatsapp || '601110085626').replace(/\+/g, '');

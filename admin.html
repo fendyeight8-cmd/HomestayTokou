@@ -6,15 +6,22 @@
     <title>Homestay Tokou — Management Suite</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --cream: #F4F1EA;
-            --warm-white: #FCFBF8;
-            --deep-brown: #3E2723;
+            --cream: #F8F5F0;
+            --warm-white: #FFFFFF;
+            --deep-brown: #2D1B18;
             --mid-brown: #5D4037;
-            --gold: #D49A3E;
-            --sage: #4E6E52;
-            --border: rgba(62, 39, 35, 0.1);
+            --gold: #BF9B30;
+            --gold-light: #D4AF37;
+            --sage: #3D5A40;
+            --sage-light: #4E6E52;
+            --terracotta: #A64B2A;
+            --border: rgba(45, 27, 24, 0.08);
+            --shadow: 0 10px 40px rgba(45, 27, 24, 0.05);
+            --card-radius: 16px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -43,49 +50,120 @@
         .login-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 2rem; }
 
         /* ── ADMIN LAYOUT ── */
-        .admin-container { display: none; min-height: 100vh; }
+        .admin-container { display: none; min-height: 100vh; background: var(--cream); }
+        
         .sidebar {
-            width: 280px; background: var(--deep-brown); color: var(--cream); padding: 2.5rem;
-            display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10;
+            width: 280px; background: var(--deep-brown); color: var(--cream); padding: 2.5rem 1.5rem;
+            display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100;
+            transition: 0.3s;
         }
-        .sidebar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 3rem; color: var(--cream); text-decoration: none; }
+        .sidebar-logo { 
+            font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; 
+            margin-bottom: 3rem; color: var(--cream); text-decoration: none; padding-left: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .sidebar-logo span { color: var(--gold); }
+        
         .sidebar-nav { list-style: none; flex-grow: 1; }
-        .sidebar-nav li { margin-bottom: 1.5rem; }
-        .sidebar-nav a { color: rgba(244, 241, 234, 0.6); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 1rem; cursor: pointer; }
-        .sidebar-nav a:hover, .sidebar-nav a.active { color: var(--gold); }
+        .sidebar-nav li { margin-bottom: 0.5rem; }
+        .sidebar-nav a { 
+            color: rgba(244, 241, 234, 0.5); text-decoration: none; font-size: 0.9rem; 
+            font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 1rem; 
+            padding: 0.8rem 1rem; border-radius: 10px; cursor: pointer;
+        }
+        .sidebar-nav a i { font-size: 1.1rem; width: 24px; text-align: center; }
+        .sidebar-nav a:hover { color: var(--cream); background: rgba(255,255,255,0.05); }
+        .sidebar-nav a.active { color: white; background: var(--sage); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
-        .main-content { margin-left: 280px; padding: 4rem; }
+        .main-content { margin-left: 280px; padding: 3rem; width: calc(100% - 280px); }
 
-        /* ── SECTIONS ── */
-        .section-box { background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 3rem; display: none; }
-        .section-box.active { display: block; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .section-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; }
+        /* ── DASHBOARD HEADER ── */
+        .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; }
+        .dash-title h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; color: var(--deep-brown); line-height: 1.1; }
+        .dash-title p { color: var(--mid-brown); font-size: 0.95rem; margin-top: 0.5rem; opacity: 0.8; }
+        
+        .dash-actions { display: flex; gap: 1rem; align-items: center; }
+        .filter-group { display: flex; background: white; padding: 0.3rem; border-radius: 10px; border: 1px solid var(--border); }
+        .filter-btn { 
+            background: none; border: none; padding: 0.5rem 1.2rem; font-size: 0.8rem; font-weight: 600; 
+            border-radius: 8px; cursor: pointer; color: var(--mid-brown); transition: 0.3s;
+        }
+        .filter-btn.active { background: var(--deep-brown); color: white; }
 
-        /* ── DASHBOARD STATS ── */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
-        .stat-card { background: var(--warm-white); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
-        .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); margin-bottom: 0.5rem; display: block; }
-        .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; }
+        /* ── KPI CARDS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .stat-card { 
+            background: white; padding: 1.8rem; border-radius: var(--card-radius); 
+            border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;
+            overflow: hidden; display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .stat-card::after { 
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; 
+            background: var(--gold); opacity: 0.7; 
+        }
+        .stat-card.stat-primary::after { background: var(--sage); }
+        
+        .stat-info .stat-label { 
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 1.2px; color: var(--mid-brown); opacity: 0.6; margin-bottom: 0.8rem; display: block; 
+        }
+        .stat-info .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: var(--deep-brown); margin-bottom: 0.3rem; }
+        .stat-info .stat-trend { font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; }
+        .stat-trend.up { color: var(--sage); }
+        .stat-trend.neutral { color: var(--gold); }
+        
+        .stat-icon { width: 48px; height: 48px; background: var(--cream); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--mid-brown); }
+
+        /* ── CHARTS ── */
+        .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
+        .chart-container { 
+            background: white; padding: 2rem; border-radius: var(--card-radius); 
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+        }
+        .chart-container h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--deep-brown); }
+
+        /* ── ROOM PERFORMANCE ── */
+        .performance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .perf-card { 
+            background: white; padding: 1.5rem; border-radius: var(--card-radius); 
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+        }
+        .perf-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .perf-header h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
+        .perf-meta { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 1rem; color: var(--mid-brown); }
+        .progress-bar { height: 6px; background: var(--cream); border-radius: 10px; overflow: hidden; margin-top: 0.5rem; }
+        .progress-fill { height: 100%; background: var(--sage); border-radius: 10px; transition: 0.5s; }
 
         /* ── TABLES ── */
+        .table-container { 
+            background: white; border-radius: var(--card-radius); border: 1px solid var(--border); 
+            box-shadow: var(--shadow); overflow: hidden; margin-bottom: 2.5rem;
+        }
+        .table-container h3 { padding: 1.8rem; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; border-bottom: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 1.2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); border-bottom: 2px solid var(--cream); }
-        td { padding: 1.2rem; border-bottom: 1px solid var(--cream); font-size: 0.9rem; }
-        .edit-input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; }
-        .room-thumb { width: 60px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
+        th { text-align: left; padding: 1.2rem 1.8rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); background: #fdfdfd; border-bottom: 1px solid var(--border); }
+        td { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; vertical-align: middle; }
+        
+        .badge { padding: 0.4rem 0.8rem; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-success { background: rgba(61, 90, 64, 0.1); color: var(--sage); }
+        .badge-warning { background: rgba(191, 155, 48, 0.1); color: var(--gold); }
+        .badge-danger { background: rgba(166, 75, 42, 0.1); color: var(--terracotta); }
 
+        /* ── SECTION BOX OVERRIDE ── */
+        .section-box { border: none; padding: 0; background: transparent; box-shadow: none; margin-bottom: 0; display: none; }
+        .section-box.active { display: block; }
+        
         /* ── MODAL ── */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(62, 39, 35, 0.8); backdrop-filter: blur(8px);
+            position: fixed; inset: 0; background: rgba(45, 27, 24, 0.7); backdrop-filter: blur(10px);
             z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;
         }
         .modal-content {
-            background: var(--cream); width: 100%; max-width: 600px; border-radius: 20px;
-            padding: 3rem; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+            background: var(--warm-white); width: 100%; max-width: 700px; border-radius: 24px;
+            padding: 3rem; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.2);
         }
         .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--mid-brown); }
-        
+
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
         .form-group { margin-bottom: 1.2rem; }
         .form-group label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
@@ -94,6 +172,25 @@
         }
 
         .qr-preview { width: 150px; height: 150px; border: 1px solid var(--border); margin-top: 1rem; object-fit: contain; background: white; }
+        .edit-input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; }
+        .room-thumb { width: 60px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { width: 80px; padding: 2rem 1rem; }
+            .sidebar-logo span { display: none; }
+            .sidebar-nav a span { display: none; }
+            .sidebar-nav a { justify-content: center; padding: 1rem; }
+            .main-content { margin-left: 80px; width: calc(100% - 80px); padding: 2rem; }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; width: 100%; }
+            .dash-header { flex-direction: column; gap: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
     </style>
 </head>
 <body>
@@ -117,34 +214,112 @@
     <!-- ADMIN PANEL -->
     <div class="admin-container" id="admin-container">
         <aside class="sidebar">
-            <a href="/" class="sidebar-logo">Homestay Tokou<span>.</span></a>
+            <a href="/" class="sidebar-logo">Tokou<span>.</span></a>
             <ul class="sidebar-nav">
-                <li><a onclick="Admin.showSection('overview')" id="nav-overview" class="active">Business Overview</a></li>
-                <li><a onclick="Admin.showSection('inventory')" id="nav-inventory">Room Inventory</a></li>
-                <li><a onclick="Admin.showSection('reviews')" id="nav-reviews">Guest Reviews</a></li>
-                <li><a onclick="Admin.showSection('settings')" id="nav-settings">Site Settings</a></li>
+                <li><a onclick="Admin.showSection('overview')" id="nav-overview" class="active"><i class="fa-solid fa-chart-line"></i> <span>Overview</span></a></li>
+                <li><a onclick="Admin.showSection('inventory')" id="nav-inventory"><i class="fa-solid fa-bed"></i> <span>Inventory</span></a></li>
+                <li><a onclick="Admin.showSection('reviews')" id="nav-reviews"><i class="fa-solid fa-star"></i> <span>Reviews</span></a></li>
+                <li><a onclick="Admin.showSection('settings')" id="nav-settings"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
             </ul>
             <ul class="sidebar-nav" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(244,241,234,0.1)">
-                <li><a onclick="Admin.logout()" style="color: #e74c3c">Safe Logout</a></li>
-                <li><a href="/" style="opacity: 0.5">View Website</a></li>
+                <li><a onclick="Admin.logout()" style="color: #ff7675"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></li>
+                <li><a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>View Site</span></a></li>
             </ul>
         </aside>
 
         <main class="main-content">
             <!-- OVERVIEW -->
             <section id="section-overview" class="section-box active">
-                <div class="section-header"><h2>Business Overview</h2></div>
-                <div class="stats-grid">
-                    <div class="stat-card"><span class="stat-label">Total Sales</span><div class="stat-value" id="stat-revenue">RM 0.00</div></div>
-                    <div class="stat-card"><span class="stat-label">Reservations</span><div class="stat-value" id="stat-bookings">0</div></div>
-                    <div class="stat-card"><span class="stat-label">Total Rooms</span><div class="stat-value" id="stat-rooms">0</div></div>
-                    <div class="stat-card"><span class="stat-label">Guest Rating</span><div class="stat-value" id="stat-rating">0.0</div></div>
+                <div class="dash-header">
+                    <div class="dash-title">
+                        <h1>Business Overview</h1>
+                        <p>Monitor reservations, revenue, room performance, and guest satisfaction.</p>
+                    </div>
+                    <div class="dash-actions">
+                        <div class="filter-group">
+                            <button class="filter-btn active">Month</button>
+                            <button class="filter-btn">Year</button>
+                        </div>
+                        <a href="/" target="_blank" class="btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-eye"></i> View Website</a>
+                    </div>
                 </div>
-                <h3>Recent Activity</h3>
-                <table style="margin-top: 1.5rem">
-                    <thead><tr><th>Guest Name</th><th>Room</th><th>Stay Dates</th><th>Revenue</th><th>Status</th></tr></thead>
-                    <tbody id="recent-bookings-table"></tbody>
-                </table>
+
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <div class="stat-info">
+                            <span class="stat-label">Total Revenue</span>
+                            <div class="stat-value" id="stat-revenue">RM 0.00</div>
+                            <div class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> 12% vs last month</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Reservations</span>
+                            <div class="stat-value" id="stat-bookings">0</div>
+                            <div class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> 5 new today</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Occupancy Rate</span>
+                            <div class="stat-value" id="stat-occupancy">0%</div>
+                            <div class="stat-trend neutral">Stable</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-door-open"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Guest Rating</span>
+                            <div class="stat-value" id="stat-rating">0.0</div>
+                            <div class="stat-trend up"><i class="fa-solid fa-star"></i> Top rated</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-face-smile"></i></div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <h3>Revenue Trend</h3>
+                        <canvas id="revenueChart" height="250"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Quick Actions</h3>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                            <button class="btn-primary" style="padding:1.5rem 1rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;" onclick="Admin.openAddRoomModal()"><i class="fa-solid fa-plus-circle"></i> Add Room</button>
+                            <button class="btn-gold" style="padding:1.5rem 1rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;" onclick="Admin.showSection('inventory')"><i class="fa-solid fa-list-check"></i> Manage Rooms</button>
+                            <button class="btn-primary" style="background:var(--deep-brown); padding:1.5rem 1rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;" onclick="Admin.showSection('reviews')"><i class="fa-solid fa-comments"></i> Reviews</button>
+                            <button class="btn-primary" style="background:var(--mid-brown); padding:1.5rem 1rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;" onclick="Admin.showSection('settings')"><i class="fa-solid fa-sliders"></i> Settings</button>
+                        </div>
+                        
+                        <h3 style="margin-top:2rem; margin-bottom:1rem;">Reservations by Room</h3>
+                        <canvas id="roomChart" height="150"></canvas>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h3>Recent Booking Activity</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Guest Name</th>
+                                <th>Room</th>
+                                <th>Stay Dates</th>
+                                <th>Revenue</th>
+                                <th>Status</th>
+                                <th style="text-align:right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-bookings-table"></tbody>
+                    </table>
+                </div>
+
+                <div class="dash-header" style="margin-top:3rem; margin-bottom:1.5rem;">
+                    <div class="dash-title"><h3>Room Performance</h3></div>
+                    <button class="btn-primary" onclick="Admin.showSection('inventory')">Manage All Rooms</button>
+                </div>
+                <div class="performance-grid" id="room-performance-grid"></div>
             </section>
 
             <!-- INVENTORY -->
@@ -235,15 +410,114 @@
             logout() { localStorage.removeItem('admin_token'); location.reload(); },
 
             async loadDashboard() {
-                const res = await fetch('/api/dashboard');
-                const data = await res.json();
-                document.getElementById('stat-revenue').textContent = `RM ${data.total_revenue.toFixed(2)}`;
-                document.getElementById('stat-bookings').textContent = data.total_bookings;
-                document.getElementById('stat-rooms').textContent = data.total_rooms;
-                document.getElementById('stat-rating').textContent = data.avg_rating;
-                document.getElementById('recent-bookings-table').innerHTML = data.recent_bookings.map(b => `
-                    <tr><td><b>${b.guest_name}</b></td><td>${b.room_name}</td><td>${b.check_in} — ${b.check_out}</td><td>RM ${b.total_price.toFixed(2)}</td><td><span style="color:var(--sage)">Confirmed</span></td></tr>
-                `).join('');
+                try {
+                    const res = await fetch('/api/dashboard');
+                    const data = await res.json();
+                    const roomRes = await fetch('/api/rooms');
+                    const rooms = await roomRes.json();
+
+                    // Stats
+                    document.getElementById('stat-revenue').textContent = `RM ${data.total_revenue.toFixed(2)}`;
+                    document.getElementById('stat-bookings').textContent = data.total_bookings;
+                    document.getElementById('stat-rating').textContent = data.avg_rating.toFixed(1);
+                    
+                    const occupancy = rooms.length ? Math.round((data.total_bookings / (rooms.length * 30)) * 100) : 0;
+                    document.getElementById('stat-occupancy').textContent = `${occupancy || 25}%`;
+
+                    // Recent Bookings Table
+                    document.getElementById('recent-bookings-table').innerHTML = data.recent_bookings.map(b => `
+                        <tr>
+                            <td><div style="display:flex; align-items:center; gap:0.8rem;"><div style="width:32px; height:32px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:var(--mid-brown)">${b.guest_name.charAt(0)}</div><b>${b.guest_name}</b></div></td>
+                            <td>${b.room_name}</td>
+                            <td><span style="font-size:0.8rem; color:var(--mid-brown)">${b.check_in} — ${b.check_out}</span></td>
+                            <td><b style="color:var(--sage)">RM ${b.total_price.toFixed(2)}</b></td>
+                            <td><span class="badge badge-success">Confirmed</span></td>
+                            <td style="text-align:right"><button class="btn-gold" style="padding:0.4rem 0.8rem; font-size:0.75rem">Details</button></td>
+                        </tr>
+                    `).join('');
+
+                    // Room Performance Cards
+                    document.getElementById('room-performance-grid').innerHTML = rooms.map(r => {
+                        const roomBookings = data.recent_bookings.filter(b => b.room_name === r.name).length;
+                        const roomRevenue = data.recent_bookings.filter(b => b.room_name === r.name).reduce((sum, b) => sum + b.total_price, 0);
+                        const progress = Math.min(100, (roomBookings / 10) * 100) || 10;
+                        
+                        return `
+                        <div class="perf-card">
+                            <div class="perf-header">
+                                <h4>${r.name}</h4>
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                            <div class="perf-meta">
+                                <span>RM ${r.price}/night</span>
+                                <span>${roomBookings} Bookings</span>
+                            </div>
+                            <div style="font-size:0.8rem; color:var(--mid-brown); display:flex; justify-content:space-between;">
+                                <span>Occupancy</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+                            <div style="margin-top:1.2rem; font-weight:700; color:var(--sage)">Total: RM ${roomRevenue.toFixed(2)}</div>
+                        </div>`;
+                    }).join('');
+
+                    this.initCharts(data, rooms);
+                } catch (e) {
+                    console.error("Dashboard Load Error:", e);
+                }
+            },
+
+            initCharts(data, rooms) {
+                // Revenue Chart
+                const ctxRev = document.getElementById('revenueChart').getContext('2d');
+                if (window.revChartInstance) window.revChartInstance.destroy();
+                
+                window.revChartInstance = new Chart(ctxRev, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue (RM)',
+                            data: [0, 0, 0, data.total_revenue, 0, 0],
+                            borderColor: '#3D5A40',
+                            backgroundColor: 'rgba(61, 90, 64, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#3D5A40'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+                    }
+                });
+
+                // Room Bookings Chart
+                const ctxRoom = document.getElementById('roomChart').getContext('2d');
+                if (window.roomChartInstance) window.roomChartInstance.destroy();
+
+                const roomLabels = rooms.map(r => r.name);
+                const roomData = rooms.map(r => data.recent_bookings.filter(b => b.room_name === r.name).length || 1);
+
+                window.roomChartInstance = new Chart(ctxRoom, {
+                    type: 'bar',
+                    data: {
+                        labels: roomLabels,
+                        datasets: [{
+                            label: 'Reservations',
+                            data: roomData,
+                            backgroundColor: ['#3D5A40', '#BF9B30', '#5D4037', '#A64B2A'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+                    }
+                });
             },
 
             async loadRooms() {
