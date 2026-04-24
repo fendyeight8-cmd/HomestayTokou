@@ -484,6 +484,19 @@
       display: flex;
       align-items: center;
       gap: 0.25rem;
+      .avail-no { background: var(--terracotta); color: white; }
+      
+      /* Booked Overlay */
+      .booked-overlay {
+        position: absolute; inset: 0;
+        background: rgba(1, 17, 37, 0.4);
+        backdrop-filter: blur(4px);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 800; font-size: 1.2rem; letter-spacing: 2px;
+        pointer-events: none; z-index: 5;
+      }
+      .room-card.room-is-booked { opacity: 0.8; }
+      
     }
     .room-capacity-badge span {
       font-weight: 400;
@@ -787,7 +800,17 @@
     .step-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
 
     .booking-summary { background: var(--bg-cream); padding: 1.5rem; border-radius: 4px; margin-bottom: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .summary-item label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
+    .summary-item label { display: block; margin-bottom: 0.3rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+    
+    .qb-room-item {
+      padding: 1.2rem; background: var(--warm-white); border-radius: 12px; border: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;
+      position: relative;
+    }
+    .qb-room-item:hover { border-color: var(--teal); transform: translateX(5px); background: white; }
+    .qb-room-item.is-booked:hover { transform: none; border-color: var(--border); }
+    .qb-info h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--navy); margin-bottom: 0.2rem; }
+    .qb-info p { font-size: 0.8rem; color: var(--steel); }
     .summary-item p { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--primary-dark); }
     .summary-total { grid-column: 1 / -1; border-top: 1px solid rgba(18,16,14,0.1); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
     .summary-total span:last-child { color: var(--gold-dark); font-size: 1.5rem; }
@@ -1111,6 +1134,10 @@
     @media (max-width: 1024px) {
       .stat-item { padding: 0 2rem; }
     }
+    
+    /* Footer Hyperlinks Styling */
+    .footer-contact a { transition: 0.3s ease; }
+    .footer-contact a:hover { color: var(--gold) !important; text-decoration: underline !important; opacity: 0.8; }
 
   </style>
 </head>
@@ -1341,11 +1368,11 @@
         </div>
         <div class="contact-item">
           <span style="color: var(--gold);">📞</span> 
-          <span id="display-whatsapp">+60 11-1008 5626</span>
+          <a href="tel:+601110085626" style="color: inherit; text-decoration: none;" id="display-whatsapp">+60 11-1008 5626</a>
         </div>
         <div class="contact-item">
           <span style="color: var(--gold);">✉</span> 
-          <span>Homestaytokou@Gmail.com</span>
+          <a href="mailto:Homestaytokou@Gmail.com" style="color: inherit; text-decoration: none;">Homestaytokou@Gmail.com</a>
         </div>
       </div>
     </div>
@@ -1787,7 +1814,16 @@
 
               renderRooms(rooms) {
                 if (!rooms.length) {
-                  UI.elements.roomsGrid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--mid-brown)">No rooms available for these criteria.</p>`;
+                  UI.elements.roomsGrid.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:5rem 2rem; background:var(--warm-white); border-radius:24px; border:1px solid var(--border);">
+                      <div style="font-size:3rem; color:var(--steel); margin-bottom:1.5rem; opacity:0.5;"><i class="fa-solid fa-calendar-xmark"></i></div>
+                      <h3 style="font-family:'Cormorant Garamond', serif; font-size:2rem; color:var(--navy); margin-bottom:1rem;">No Rooms Available</h3>
+                      <p style="color:var(--steel); max-width:500px; margin:0 auto 2rem; line-height:1.6;">We're sorry, but all rooms are fully booked for your selected dates. Please try adjusting your schedule or contact our concierge for assistance.</p>
+                      <div style="display:flex; justify-content:center; gap:1rem;">
+                        <button class="btn-primary" onclick="window.scrollTo({top: document.getElementById('search').offsetTop - 100, behavior: 'smooth'})">Modify Search</button>
+                        <button class="btn-outline" onclick="window.open('https://wa.me/${(App.globalSettings?.whatsapp || '601110085626').replace(/\+/g, '')}', '_blank')">WhatsApp Inquiry</button>
+                      </div>
+                    </div>`;
                   return;
                 }
 
@@ -1821,9 +1857,14 @@
               generateRoomCard(r, t) {
                 const isBooked = !r.available && App.search.check_in;
                 const amenities = (r.amenities || []).filter(a => !['Private Balcony', 'Living Area', 'Private Pool'].includes(a)).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('');
-                const badge = (App.search.check_in && App.search.check_out)
-
-                  ? `<span class="room-avail ${r.available ? 'avail-yes' : 'avail-no'}">${r.available ? t.badge_available : t.badge_booked}</span>` : '';
+                
+                // Premium Badge logic
+                let badge = '';
+                if (App.search.check_in && App.search.check_out) {
+                  badge = r.available 
+                    ? `<span class="room-avail avail-yes"><i class="fa-solid fa-circle-check"></i> ${t.badge_available}</span>` 
+                    : `<span class="room-avail avail-no"><i class="fa-solid fa-circle-xmark"></i> ${t.badge_booked}</span>`;
+                }
 
                 let imageSource = null;
                 if (r.image_url) {
@@ -1835,11 +1876,12 @@
                 }
 
                 return `
-      <div class="room-card luxury-reveal" id="room-${r.id}">
+      <div class="room-card luxury-reveal ${isBooked ? 'room-is-booked' : ''}" id="room-${r.id}" style="${isBooked ? 'filter: grayscale(0.5);' : ''}">
         <div class="room-img">
-          ${imageSource ? `<img src="${imageSource}" alt="${r.name}" class="room-img-file">` : `<div class="room-img-inner img-standard"></div>`}
+          ${imageSource ? `<img src="${imageSource}" alt="${r.name}" class="room-img-file" style="${isBooked ? 'opacity: 0.7;' : ''}">` : `<div class="room-img-inner img-standard"></div>`}
           ${badge}
           <div class="room-capacity-badge">+${r.capacity} <span>guests</span></div>
+          ${isBooked ? `<div class="booked-overlay">SOLD OUT</div>` : ''}
         </div>
         <div class="room-body">
           <p class="room-type">${r.type}</p>
@@ -1848,7 +1890,11 @@
           <div class="room-amenities">${amenities}${r.amenities.length > 4 ? `<span class="amenity-tag">+${r.amenities.length - 4}</span>` : ''}</div>
           <div class="room-footer">
             <div class="room-price">${CONFIG.CURRENCY} ${r.price.toFixed(2)} <span>${t.room_night}</span></div>
-            <button class="btn-primary" onclick='App.openBooking(${JSON.stringify(r)})' ${isBooked ? 'disabled style="opacity:.5"' : ''} aria-label="Book ${r.name}">
+            <button class="btn-primary" 
+                    onclick='App.openBooking(${JSON.stringify(r)})' 
+                    ${isBooked ? 'disabled' : ''} 
+                    style="${isBooked ? 'background:var(--steel); cursor:not-allowed; opacity:0.6;' : ''}"
+                    aria-label="${isBooked ? 'Room Booked' : 'Book ' + r.name}">
               ${isBooked ? t.btn_unavailable : t.btn_book_now}
             </button>
           </div>
@@ -1905,11 +1951,12 @@
                 const params = { check_in: ci, check_out: co, guests: g };
                 ApiService.fetchRooms(params).then(rooms => {
                   App.allRooms = rooms;
+                  // REFRESH BOTH: Main grid and Quick Booking modal
+                  App.renderRooms(rooms);
                   App.showQuickBookingView(rooms);
                 }).catch(e => {
                   UI.elements.modalBody.innerHTML = `<p style="text-align:center; padding:2rem;">Connection issue. Please try again.</p>`;
                 });
-
 
                 const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
                 document.getElementById('rooms-subtitle').textContent =
@@ -1923,31 +1970,43 @@
 
                 if (!rooms.length) {
                   UI.elements.modalBody.innerHTML = `
-                    <div style="text-align:center; padding:2rem;">
-                      <p style="margin-bottom:1.5rem; color:var(--mid-brown);">No rooms match your criteria for these dates.</p>
-                      <button class="btn-primary" onclick="App.closeBooking()">Try Other Dates</button>
+                    <div style="text-align:center; padding:3rem 1rem;">
+                      <div style="font-size:2.5rem; color:var(--steel); margin-bottom:1rem; opacity:0.3;"><i class="fa-solid fa-hotel"></i></div>
+                      <p style="margin-bottom:1.5rem; color:var(--steel); line-height:1.6;">We're fully booked for these specific dates.<br>Try a different date range for the best experience.</p>
+                      <button class="btn-primary" onclick="App.closeBooking()">Choose Other Dates</button>
                     </div>`;
                   return;
                 }
 
-                const roomListHtml = rooms.map(r => `
-                  <div class="qb-room-item" onclick='App.openBooking(${JSON.stringify(r)})'>
+                // Filter out unavailable rooms or show them as disabled
+                const roomListHtml = rooms.map(r => {
+                  const isAvailable = r.available;
+                  return `
+                  <div class="qb-room-item ${isAvailable ? '' : 'is-booked'}" 
+                       ${isAvailable ? `onclick='App.openBooking(${JSON.stringify(r)})'` : ''} 
+                       style="${isAvailable ? '' : 'opacity:0.6; cursor:not-allowed; background:rgba(0,0,0,0.02);'}">
                     <div class="qb-info">
-                      <h4>${r.name}</h4>
+                      <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <h4 style="margin:0">${r.name}</h4>
+                        ${isAvailable 
+                          ? `<span class="room-avail avail-yes" style="font-size:0.6rem; padding:2px 6px;">Available</span>`
+                          : `<span class="room-avail avail-no" style="font-size:0.6rem; padding:2px 6px;">Booked</span>`}
+                      </div>
                       <p>${r.type} · Max ${r.capacity} Guests</p>
                     </div>
                     <div class="qb-pricing">
                       <span class="qb-rate">${CONFIG.CURRENCY} ${r.price.toFixed(2)} / night</span>
                       <span class="qb-total">${CONFIG.CURRENCY} ${(r.price * nights).toFixed(2)}</span>
                     </div>
+                    ${!isAvailable ? `<div style="position:absolute; right:10px; top:10px; color:var(--terracotta); font-size:0.7rem; font-weight:700; text-transform:uppercase;">Unavailable</div>` : ''}
                   </div>
-                `).join('');
+                `;}).join('');
 
                 UI.elements.modalBody.innerHTML = `
                   <div style="margin-bottom:1.5rem;">
-                    <p style="font-size:0.9rem; color:var(--mid-brown);">${nights} night stay selected. Choose your room:</p>
+                    <p style="font-size:0.9rem; color:var(--mid-brown);">${nights} night stay selected. Choose an available room:</p>
                   </div>
-                  <div class="quick-book-list">
+                  <div class="quick-book-list" style="display:flex; flex-direction:column; gap:0.8rem;">
                     ${roomListHtml}
                   </div>
                   <p style="font-size:0.75rem; text-align:center; margin-top:1.5rem; color:var(--mid-brown); opacity:0.7;">Prices inclusive of all standard service charges.</p>

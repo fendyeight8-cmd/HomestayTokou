@@ -10,18 +10,28 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --cream: #F8F5F0;
-            --warm-white: #FFFFFF;
-            --deep-brown: #2D1B18;
-            --mid-brown: #5D4037;
-            --gold: #BF9B30;
-            --gold-light: #D4AF37;
-            --sage: #3D5A40;
-            --sage-light: #4E6E52;
-            --terracotta: #A64B2A;
-            --border: rgba(45, 27, 24, 0.08);
-            --shadow: 0 10px 40px rgba(45, 27, 24, 0.05);
-            --card-radius: 16px;
+        /* ── 3-Color Palette (from index.html) ── */
+        --navy:        #011125;   /* Deepest dark */
+        --teal:        #1F4959;   /* Mid accent */
+        --steel:       #5C7C89;   /* Light accent */
+        
+        --cream:       #FAFBFC;   /* Cool light background */
+        --warm-white:  #FFFFFF;
+        --deep-brown:  var(--navy);
+        --mid-brown:   var(--teal);
+        --gold:        var(--teal);
+        --gold-light:  var(--steel);
+        --sage:        var(--teal);
+        --sage-light:  var(--steel);
+        --terracotta:  #A64B2A;
+        
+        --border:      rgba(92, 124, 137, 0.15);
+        --shadow:      0 10px 40px rgba(1, 17, 37, 0.05);
+        --card-radius: 16px;
+
+        /* Crystal Glass */
+        --crystal-bg:     rgba(240, 248, 252, 0.75);
+        --crystal-border: rgba(92, 124, 137, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,16 +63,17 @@
         .admin-container { display: none; min-height: 100vh; background: var(--cream); }
         
         .sidebar {
-            width: 280px; background: var(--deep-brown); color: var(--cream); padding: 2.5rem 1.5rem;
+            width: 280px; background: var(--navy); color: var(--cream); padding: 2.5rem 1.5rem;
             display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100;
             transition: 0.3s;
+            border-right: 1px solid rgba(92,124,137,0.1);
         }
         .sidebar-logo { 
             font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; 
             margin-bottom: 3rem; color: var(--cream); text-decoration: none; padding-left: 1rem;
             display: flex; align-items: center; gap: 0.5rem;
         }
-        .sidebar-logo span { color: var(--gold); }
+        .sidebar-logo span { color: var(--steel); }
         
         .sidebar-nav { list-style: none; flex-grow: 1; }
         .sidebar-nav li { margin-bottom: 0.5rem; }
@@ -73,7 +84,7 @@
         }
         .sidebar-nav a i { font-size: 1.1rem; width: 24px; text-align: center; }
         .sidebar-nav a:hover { color: var(--cream); background: rgba(255,255,255,0.05); }
-        .sidebar-nav a.active { color: white; background: var(--sage); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .sidebar-nav a.active { color: white; background: var(--teal); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         .main-content { margin-left: 280px; padding: 2.5rem; width: calc(100% - 280px); }
         .content-wrapper { max-width: 1400px; margin: 0 auto; }
@@ -94,15 +105,18 @@
         /* ── KPI CARDS ── */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
         .stat-card { 
-            background: white; padding: 1.5rem; border-radius: var(--card-radius); 
-            border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;
+            background: var(--crystal-bg); padding: 1.5rem; border-radius: var(--card-radius); 
+            border: 1px solid var(--crystal-border); backdrop-filter: blur(10px);
+            box-shadow: var(--shadow); position: relative;
             overflow: hidden; display: flex; justify-content: space-between; align-items: flex-start;
+            transition: 0.3s ease;
         }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--steel); }
         .stat-card::after { 
             content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; 
-            background: var(--gold); opacity: 0.7; 
+            background: var(--steel); opacity: 0.7; 
         }
-        .stat-card.stat-primary::after { background: var(--sage); }
+        .stat-card.stat-primary::after { background: var(--teal); }
         
         .stat-info .stat-label { 
             font-size: 0.75rem; font-weight: 700; text-transform: uppercase; 
@@ -139,8 +153,8 @@
             display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: 0.2s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.02); text-align: left;
         }
-        .action-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--sage); }
-        .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(61, 90, 64, 0.1); color: var(--sage); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .action-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--teal); }
+        .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(31, 73, 89, 0.1); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .action-text h4 { font-size: 0.9rem; color: var(--deep-brown); margin-bottom: 0.2rem; }
         .action-text p { font-size: 0.75rem; color: var(--mid-brown); opacity: 0.8; }
 
@@ -163,11 +177,11 @@
         }
         .table-container h3 { padding: 1.8rem; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; border-bottom: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 1.2rem 1.8rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); background: #fdfdfd; border-bottom: 1px solid var(--border); }
+        th { text-align: left; padding: 1.2rem 1.8rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--teal); background: #fdfdfd; border-bottom: 1px solid var(--border); }
         td { padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; vertical-align: middle; }
         
         .badge { padding: 0.4rem 0.8rem; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .badge-success { background: rgba(61, 90, 64, 0.1); color: var(--sage); }
+        .badge-success { background: rgba(31, 73, 89, 0.1); color: var(--teal); }
         .badge-warning { background: rgba(191, 155, 48, 0.1); color: var(--gold); }
         .badge-danger { background: rgba(166, 75, 42, 0.1); color: var(--terracotta); }
 
@@ -263,19 +277,24 @@
 </head>
 <body>
     <!-- LOGIN -->
-    <div id="login-overlay">
-        <div class="login-card">
-            <h2>Tokou Management Login</h2>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="username" placeholder="admin">
+    <div id="login-overlay" style="background: var(--navy);">
+        <div class="login-card" style="background: white; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 40px 100px rgba(0,0,0,0.2);">
+            <div style="width: 60px; height: 60px; background: rgba(31,73,89,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--teal); font-size: 1.5rem;">
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="••••••••">
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--navy);">Management Suite</h2>
+            <p style="color: var(--steel); font-size: 0.9rem; margin-bottom: 2rem;">Welcome back. Please authenticate to access the boutique hotel controls.</p>
+            
+            <div class="form-group" style="text-align: left;">
+                <label style="color: var(--steel); font-size: 0.7rem; letter-spacing: 1px;">Username</label>
+                <input type="text" id="username" placeholder="admin" style="background: var(--cream); border: 1px solid var(--border); padding: 1rem; border-radius: 10px; width: 100%; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--teal)'">
             </div>
-            <button class="btn-primary" style="width: 100%" onclick="Admin.login()">Enter Suite</button>
-            <p id="login-error" style="color: #c0392b; font-size: 0.8rem; margin-top: 1rem; display: none;">Invalid credentials. (Hint: admin / admin123)</p>
+            <div class="form-group" style="text-align: left; margin-bottom: 2rem;">
+                <label style="color: var(--steel); font-size: 0.7rem; letter-spacing: 1px;">Password</label>
+                <input type="password" id="password" placeholder="••••••••" style="background: var(--cream); border: 1px solid var(--border); padding: 1rem; border-radius: 10px; width: 100%; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--teal)'">
+            </div>
+            <button class="btn-primary" style="width: 100%; padding: 1.2rem; font-size: 1rem; border-radius: 12px; cursor: pointer; background: var(--teal); border: none; color: white; font-weight: 600;" onclick="Admin.login()">Enter Suite</button>
+            <p id="login-error" style="color: var(--terracotta); font-size: 0.8rem; margin-top: 1.5rem; display: none;"><i class="fa-solid fa-circle-exclamation"></i> Invalid credentials. Please try again.</p>
         </div>
     </div>
 
@@ -663,10 +682,11 @@
 
     <!-- ROOM MODAL -->
     <div class="modal-overlay" id="room-modal">
-        <div class="modal-content" style="max-width: 720px;">
+        <div class="modal-content" id="room-modal-content" style="max-width: 720px;">
+            <!-- Content here is preserved for room editing -->
             <button class="modal-close" onclick="Admin.closeRoomModal()">✕</button>
-            <h2 id="modal-title" style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--deep-brown); margin-bottom: 0.5rem;">Add New Room</h2>
-            <p id="modal-subtitle" style="color: var(--mid-brown); margin-bottom: 2rem;">Update room details, pricing, capacity, status, and image.</p>
+            <h2 id="modal-title" style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--navy); margin-bottom: 0.5rem;">Add New Room</h2>
+            <p id="modal-subtitle" style="color: var(--steel); margin-bottom: 2rem;">Update room details, pricing, capacity, status, and image.</p>
             
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <!-- Image Upload -->
@@ -674,11 +694,11 @@
                     <label class="inline-edit-label" style="font-size: 0.8rem;">Room Photo</label>
                     <div style="position:relative; width:100%; height:220px; background:var(--cream); border-radius:12px; border:2px dashed var(--border); overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;" onclick="document.getElementById('modal-room-image').click()">
                         <img id="modal-room-image-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; position:absolute; inset:0;">
-                        <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem; color:var(--mid-brown); margin-bottom:0.5rem; position:relative; z-index:1;"></i>
-                        <span style="font-size:0.8rem; color:var(--mid-brown); position:relative; z-index:1;">Click to upload (Max 5MB)</span>
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem; color:var(--steel); margin-bottom:0.5rem; position:relative; z-index:1;"></i>
+                        <span style="font-size:0.8rem; color:var(--steel); position:relative; z-index:1;">Click to upload (Max 5MB)</span>
                         
                         <!-- Change Photo Overlay Button -->
-                        <div id="modal-change-photo-btn" style="display:none; position:absolute; bottom:10px; right:10px; background:rgba(255,255,255,0.9); padding:0.4rem 0.8rem; border-radius:4px; font-size:0.8rem; font-weight:bold; color:var(--deep-brown); z-index:2; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                        <div id="modal-change-photo-btn" style="display:none; position:absolute; bottom:10px; right:10px; background:rgba(255,255,255,0.9); padding:0.4rem 0.8rem; border-radius:4px; font-size:0.8rem; font-weight:bold; color:var(--navy); z-index:2; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
                             <i class="fa-solid fa-camera"></i> Change Photo
                         </div>
                         
@@ -721,9 +741,16 @@
             </div>
             
             <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border);">
-                <button class="btn-primary" style="background:transparent; color:var(--mid-brown); border:1px solid var(--border);" onclick="Admin.closeRoomModal()">Cancel</button>
-                <button class="btn-gold" id="btn-submit-room" onclick="Admin.submitRoom()">Create Room</button>
+                <button class="btn-primary" style="background:transparent; color:var(--steel); border:1px solid var(--border);" onclick="Admin.closeRoomModal()">Cancel</button>
+                <button class="btn-primary" id="btn-submit-room" onclick="Admin.submitRoom()">Create Room</button>
             </div>
+        </div>
+    </div>
+
+    <!-- DETAILS MODAL (Separate to prevent overwriting room form) -->
+    <div class="modal-overlay" id="details-modal">
+        <div class="modal-content" id="details-modal-content" style="max-width: 600px;">
+            <!-- Content injected here -->
         </div>
     </div>
 
@@ -779,12 +806,12 @@
                     // Recent Bookings Table
                     document.getElementById('recent-bookings-table').innerHTML = data.recent_bookings.map(b => `
                         <tr>
-                            <td><div style="display:flex; align-items:center; gap:0.8rem;"><div style="width:32px; height:32px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:var(--mid-brown)">${b.guest_name.charAt(0)}</div><b>${b.guest_name}</b></div></td>
+                            <td><div style="display:flex; align-items:center; gap:0.8rem;"><div style="width:32px; height:32px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:var(--teal)">${b.guest_name.charAt(0)}</div><b>${b.guest_name}</b></div></td>
                             <td>${b.room_name}</td>
-                            <td><span style="font-size:0.8rem; color:var(--mid-brown)">${b.check_in} — ${b.check_out}</span></td>
-                            <td><b style="color:var(--sage)">RM ${b.total_price.toFixed(2)}</b></td>
+                            <td><span style="font-size:0.8rem; color:var(--teal)">${b.check_in} — ${b.check_out}</span></td>
+                            <td><b style="color:var(--teal)">RM ${b.total_price.toFixed(2)}</b></td>
                             <td><span class="badge badge-success">Confirmed</span></td>
-                            <td style="text-align:right"><button class="btn-gold" style="padding:0.4rem 0.8rem; font-size:0.75rem">Details</button></td>
+                            <td style="text-align:right"><button class="btn-primary" style="padding:0.4rem 0.8rem; font-size:0.75rem" onclick="Admin.showBookingDetails(${b.id})">Details</button></td>
                         </tr>
                     `).join('');
 

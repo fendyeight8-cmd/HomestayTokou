@@ -180,11 +180,13 @@ def handle_get_rooms(params: Dict[str, List[str]]) -> Tuple[int, bytes]:
         for r in rooms:
             if check_in and check_out:
                 # Check for conflicting bookings
-                # Overlap if: (existing_check_in < requested_check_out) AND (existing_check_out > requested_check_in)
+                # A booking is conflicting if:
+                # (existing_check_in < requested_check_out) AND (existing_check_out > requested_check_in)
+                # AND status is not cancelled/rejected/expired
                 conflicts = conn.execute("""
                     SELECT COUNT(*) FROM bookings 
                     WHERE room_id = ? 
-                    AND status != 'cancelled'
+                    AND status NOT IN ('cancelled', 'rejected', 'expired')
                     AND (check_in < ? AND check_out > ?)
                 """, (r['id'], check_out, check_in)).fetchone()[0]
                 r['available'] = (conflicts == 0)
@@ -299,7 +301,7 @@ def handle_add_booking(data: Dict[str, Any]) -> Tuple[int, bytes]:
         conflicts = conn.execute("""
             SELECT COUNT(*) FROM bookings
             WHERE room_id = ?
-              AND status != 'cancelled'
+              AND status NOT IN ('cancelled', 'rejected', 'expired')
               AND check_in  < ?
               AND check_out > ?
         """, (room_id, check_out, check_in)).fetchone()[0]
