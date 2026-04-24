@@ -262,6 +262,70 @@ def handle_update_setting(data: Dict[str, Any]) -> Tuple[int, bytes]:
         conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (key, val))
         return json_response({"success": True})
 
+def handle_add_booking(data: Dict[str, Any]) -> Tuple[int, bytes]:
+    """Create a new booking with atomic conflict detection to prevent double-bookings."""
+    room_id   = data.get('room_id')
+    guest     = data.get('guest_name', '').strip()
+    check_in  = data.get('check_in', '').strip()
+    check_out = data.get('check_out', '').strip()
+    total     = data.get('total_price', 0)
+
+    if not all([room_id, guest, check_in, check_out]):
+        return json_response({"error": "Missing required fields"}, 400)
+
+    # Ensure room_id is integer (JSON may send string)
+    try:
+        room_id = int(room_id)
+    except (TypeError, ValueError):
+        return json_response({"error": "Invalid room_id"}, 400)
+
+    # Validate date format
+    try:
+        from datetime import datetime
+        datetime.strptime(check_in,  '%Y-%m-%d')
+        datetime.strptime(check_out, '%Y-%m-%d')
+    except ValueError:
+        return json_response({"error": "Invalid date format"}, 400)
+
+    if check_in >= check_out:
+        return json_response({"error": "check_out must be after check_in"}, 400)
+
+    conn = sqlite3.connect(DB_PATH, timeout=15)
+    conn.row_factory = sqlite3.Row
+    try:
+        # BEGIN IMMEDIATE locks the DB immediately — prevents race conditions
+        conn.execute("BEGIN IMMEDIATE")
+
+        conflicts = conn.execute("""
+            SELECT COUNT(*) FROM bookings
+            WHERE room_id = ?
+              AND status != 'cancelled'
+              AND check_in  < ?
+              AND check_out > ?
+        """, (room_id, check_out, check_in)).fetchone()[0]
+
+        if conflicts > 0:
+            conn.rollback()
+            conn.close()
+            return json_response({"error": "Room is already booked for these dates", "conflict": True}, 409)
+
+        conn.execute("""
+            INSERT INTO bookings (room_id, guest_name, check_in, check_out, total_price, status)
+            VALUES (?, ?, ?, ?, ?, 'confirmed')
+        """, (room_id, guest, check_in, check_out, total))
+
+        conn.commit()
+        conn.close()
+        logger.info(f"Booking confirmed: Room {room_id} | {guest} | {check_in} → {check_out}")
+        return json_response({"success": True, "message": "Booking confirmed"})
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        logger.error(f"Booking error: {e}")
+        return json_response({"error": "Booking failed, please try again"}, 500)
+
+
 # ─── HTTP Server ──────────────────────────────────────────────────────────────
 
 MIME_TYPES = {
@@ -374,6 +438,7 @@ class HomestayHandler(BaseHTTPRequestHandler):
                 rid = int(path.split('/')[-1])
                 return self.send_json(*handle_update_room(rid, data))
             if path.rstrip('/') == '/api/settings/update': return self.send_json(*handle_update_setting(data))
+            if path.rstrip('/') == '/api/bookings': return self.send_json(*handle_add_booking(data))
             
             if path == '/api/upload':
                 return self.handle_upload(post_data)
