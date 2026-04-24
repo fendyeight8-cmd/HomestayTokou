@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+{% block title %}{{ room.name }} — {{ prop_name }}{% endblock %}
+{% block meta_desc %}{{ room.short_desc }} Book the {{ room.name }} at {{ prop_name }}, {{ settings.property_location }}.{% endblock %}
+
+{% block content %}
+<div style="padding-top:74px">
+
+  <!-- ── ROOM HERO ─────────────────────────────────────── -->
+  <div class="room-hero">
+    <div class="rh-photo" style="background:{{ room.gradient_css }}">
+      <div class="rh-overlay"></div>
+      <div class="rh-emoji">{{ room.emoji }}</div>
+      {% if room.badge_text %}
+      <div class="rh-badge badge-{{ room.badge_color }}">{{ room.badge_text }}</div>
+      {% endif %}
+    </div>
+    <div class="rh-content">
+      <div class="rh-breadcrumb">
+        <a href="/">Home</a> <span>›</span>
+        <a href="/rooms">Rooms</a> <span>›</span>
+        <span>{{ room.name }}</span>
+      </div>
+      <div class="rh-type">{{ room.room_type }} · {{ room.view_type }}</div>
+      <h1 class="rh-title">{{ room.name }}</h1>
+      <div class="rh-meta">
+        <div class="rh-meta-item">
+          <span class="rh-meta-icon">🛏</span>
+          <span>{{ room.beds }}</span>
+        </div>
+        <div class="rh-meta-item">
+          <span class="rh-meta-icon">🚿</span>
+          <span>{{ room.bathrooms }} Bathroom{{ 's' if room.bathrooms > 1 }}</span>
+        </div>
+        <div class="rh-meta-item">
+          <span class="rh-meta-icon">👥</span>
+          <span>Up to {{ room.max_guests }} guests</span>
+        </div>
+        <div class="rh-meta-item">
+          <span class="rh-meta-icon">🌿</span>
+          <span>{{ room.view_type }}</span>
+        </div>
+      </div>
+      <div class="rh-price-row">
+        <div>
+          <span class="rh-price">RM {{ "%.0f"|format(room.price_night) }}</span>
+          <span class="rh-price-sub">per night · Breakfast included</span>
+        </div>
+        <a href="/booking?room_slug={{ room.slug }}" class="btn-primary">
+          Reserve This Room
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROOM BODY ──────────────────────────────────────── -->
+  <div class="room-body-layout">
+
+    <!-- Main column -->
+    <div class="room-main-col">
+
+      <!-- About -->
+      <div class="rd-section">
+        <h2 class="rd-section-title">About this room</h2>
+        <p class="rd-description">{{ room.description }}</p>
+      </div>
+
+      <!-- Amenities -->
+      <div class="rd-section">
+        <h2 class="rd-section-title">Amenities</h2>
+        <div class="rd-amenities">
+          {% set amenity_icons = {
+            'Air Conditioning': '❄️',
+            'Free WiFi': '📶',
+            'Breakfast Included': '🍳',
+            'Ensuite Bathroom': '🚿',
+            'Private Balcony': '🌅',
+            'Private Terrace': '🌿',
+            'Private Deck': '🏞️',
+            'Forest View': '🌳',
+            'Garden View': '🌸',
+            'River View': '🌊',
+            'Treetop View': '🌲',
+            'Courtyard View': '🏡',
+            'Courtyard Access': '🏡',
+            'Jungle View': '🌿',
+            'King Bed': '🛏️',
+            'Queen Bed': '🛏',
+            'Ceiling Fan': '💨',
+            'Minibar': '🥤',
+            'Soaking Tub': '🛁',
+            'Outdoor Rain Shower': '🚿',
+            'Outdoor Shower': '🚿',
+            'Full Kitchen': '🍽️',
+            'Wraparound Veranda': '🏛️',
+            'BBQ Area': '🔥',
+            'Parking': '🚗',
+          } %}
+          {% for feat in room.amenities.split(',') %}
+          {% set feat_clean = feat.strip() %}
+          <div class="rd-amenity">
+            <span class="rd-amenity-icon">{{ amenity_icons.get(feat_clean, '✓') }}</span>
+            <span>{{ feat_clean }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Photo gallery placeholders -->
+      <div class="rd-section">
+        <h2 class="rd-section-title">Gallery</h2>
+        <div class="rd-gallery">
+          {% set shades = ['0.9','0.75','0.6','0.45'] %}
+          {% for i in range(4) %}
+          <div class="rd-gallery-item" style="background:{{ room.gradient_css }};opacity:{{ shades[i] }}">
+            <span style="font-size:28px">{{ room.emoji }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <p style="font-size:12px;color:var(--bark-400);margin-top:10px;font-family:var(--ff-mono)">
+          Add real photos by placing images in static/img/{{ room.slug }}/
+        </p>
+      </div>
+
+      <!-- Availability calendar (read-only view) -->
+      <div class="rd-section">
+        <h2 class="rd-section-title">Availability</h2>
+        <p style="font-size:13px;font-weight:300;color:var(--bark-400);margin-bottom:16px">
+          Strikethrough dates are already booked. Green dates are available.
+        </p>
+        <div class="cal-wrap" id="avail-cal">
+          <div class="cal-hd">
+            <div class="cal-month" id="avail-cal-title">—</div>
+            <div class="cal-navs">
+              <button class="cal-nb" onclick="shiftAvailMonth(-1)">‹</button>
+              <button class="cal-nb" onclick="shiftAvailMonth(1)">›</button>
+            </div>
+          </div>
+          <div class="cal-grid" id="avail-cal-grid"></div>
+        </div>
+        <div style="margin-top:16px">
+          <a href="/booking?room_slug={{ room.slug }}" class="btn-leaf">
+            Book This Room →
+          </a>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      {% if reviews %}
+      <div class="rd-section">
+        <h2 class="rd-section-title">Guest Reviews</h2>
+        <div class="rd-reviews">
+          {% for rv in reviews %}
+          <div class="rd-review">
+            <div class="rv-stars" style="margin-bottom:10px">{{ "★" * rv.rating }}{{ "☆" * (5 - rv.rating) }}</div>
+            <p class="rv-text" style="color:var(--bark-600);font-size:14px">"{{ rv.comment }}"</p>
+            <div class="rv-author" style="margin-top:14px">
+              <div class="rv-avatar" style="background:var(--leaf-50);color:var(--leaf-600)">{{ rv.reviewer_name[0] }}</div>
+              <div>
+                <div class="rv-name" style="color:var(--bark-800)">{{ rv.reviewer_name }}</div>
+                <div class="rv-loc">{{ rv.location }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="room-sidebar-col">
+      <div class="rd-booking-card">
+        <div class="rdb-price">
+          <span class="rdb-price-num">RM {{ "%.0f"|format(room.price_night) }}</span>
+          <span class="rdb-price-sub">/ night</span>
+        </div>
+        <div class="rdb-inc">
+          🌅 Breakfast included · 📶 Free WiFi · 🚗 Free Parking
+        </div>
+        <div class="rdb-divider"></div>
+        <div class="rdb-details">
+          <div class="rdb-row">
+            <span class="rdb-label">Room Type</span>
+            <span class="rdb-val">{{ room.room_type }}</span>
+          </div>
+          <div class="rdb-row">
+            <span class="rdb-label">Beds</span>
+            <span class="rdb-val">{{ room.beds }}</span>
+          </div>
+          <div class="rdb-row">
+            <span class="rdb-label">Bathrooms</span>
+            <span class="rdb-val">{{ room.bathrooms }}</span>
+          </div>
+          <div class="rdb-row">
+            <span class="rdb-label">Max Guests</span>
+            <span class="rdb-val">{{ room.max_guests }}</span>
+          </div>
+          <div class="rdb-row">
+            <span class="rdb-label">View</span>
+            <span class="rdb-val">{{ room.view_type }}</span>
+          </div>
+          <div class="rdb-row">
+            <span class="rdb-label">Check-in</span>
+            <span class="rdb-val">{{ settings.checkin_time }}</span>
+          </div>
+          <div class="rdb-row">
+            <span class="rdb-label">Check-out</span>
+            <span class="rdb-val">{{ settings.checkout_time }}</span>
+          </div>
+        </div>
+        <div class="rdb-divider"></div>
+        <a href="/booking?room_slug={{ room.slug }}" class="btn-primary" style="width:100%;justify-content:center">
+          Reserve Now
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <div style="text-align:center;font-size:11px;color:var(--bark-400);margin-top:10px">
+          No deposit required · Pay on arrival
+        </div>
+        <div class="rdb-divider"></div>
+        <a href="{{ wa_enquiry }}" target="_blank" class="btn-wa" style="width:100%;justify-content:center">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.856L0 24l6.335-1.611A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.374l-.36-.213-3.726.948.98-3.623-.234-.372A9.818 9.818 0 1112 21.818z"/></svg>
+          Ask a Question
+        </a>
+        <div style="text-align:center;font-size:11px;color:var(--bark-400);margin-top:6px">
+          {{ wa_number }} · Usually replies in 30 min
+        </div>
+      </div>
+
+      <!-- Other rooms -->
+      <div class="rd-other-rooms">
+        <div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--bark-400);margin-bottom:14px">
+          Other Rooms
+        </div>
+        {% set other_rooms = [] %}
+        {% for r in rooms|default([]) %}
+          {% if r.slug != room.slug %}
+          <a href="/rooms/{{ r.slug }}" class="rd-other-room">
+            <div class="rd-or-swatch" style="background:{{ r.gradient_css }}">{{ r.emoji }}</div>
+            <div>
+              <div class="rd-or-name">{{ r.name }}</div>
+              <div class="rd-or-price">RM {{ "%.0f"|format(r.price_night) }}/night</div>
+            </div>
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── Room Hero ────────────────────────────────────────── */
+.room-hero{display:grid;grid-template-columns:1fr 1fr;min-height:480px}
+.rh-photo{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.rh-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(30,21,8,.1) 0%,rgba(30,21,8,.3) 100%);
+}
+.rh-emoji{
+  font-size:72px;z-index:1;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.2));
+}
+.rh-badge{
+  position:absolute;top:24px;left:24px;z-index:2;
+  padding:5px 14px;border-radius:20px;
+  font-family:var(--ff-mono);font-size:11px;letter-spacing:.07em;
+}
+.rh-content{
+  padding:52px 48px;background:var(--ivory);
+  display:flex;flex-direction:column;justify-content:center;
+}
+.rh-breadcrumb{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--bark-400);margin-bottom:16px;
+}
+.rh-breadcrumb a{color:var(--bark-400);transition:color .2s}
+.rh-breadcrumb a:hover{color:var(--leaf-600)}
+.rh-breadcrumb span{color:var(--bark-300)}
+.rh-type{
+  font-family:var(--ff-mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--leaf-600);margin-bottom:10px;
+}
+.rh-title{
+  font-family:var(--ff-display);font-size:clamp(36px,4vw,56px);
+  font-weight:400;line-height:1.1;color:var(--bark-800);margin-bottom:22px;
+}
+.rh-meta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+.rh-meta-item{
+  display:flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:300;color:var(--bark-500);
+}
+.rh-meta-icon{font-size:15px}
+.rh-price-row{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+  padding-top:22px;border-top:1px solid var(--bark-100);
+}
+.rh-price{
+  font-family:var(--ff-display);font-size:38px;font-weight:400;
+  color:var(--bark-800);line-height:1;
+}
+.rh-price-sub{
+  display:block;font-size:12px;color:var(--bark-400);
+  margin-top:4px;letter-spacing:.04em;
+}
+
+/* ── Room Body Layout ─────────────────────────────────── */
+.room-body-layout{
+  display:grid;grid-template-columns:1fr 380px;
+  gap:48px;max-width:1240px;margin:0 auto;
+  padding:52px 52px 80px;
+}
+.rd-section{
+  padding-bottom:36px;margin-bottom:36px;
+  border-bottom:1px solid var(--bark-100);
+}
+.rd-section:last-child{border-bottom:none}
+.rd-section-title{
+  font-family:var(--ff-display);font-size:24px;font-weight:400;
+  color:var(--bark-800);margin-bottom:16px;
+}
+.rd-description{
+  font-size:15px;font-weight:300;line-height:1.85;color:var(--bark-500);
+}
+.rd-amenities{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rd-amenity{
+  display:flex;align-items:center;gap:9px;
+  padding:12px 14px;background:var(--warm-white);
+  border-radius:10px;border:1px solid var(--bark-100);
+  font-size:13px;font-weight:300;color:var(--bark-600);
+  transition:border-color .2s;
+}
+.rd-amenity:hover{border-color:var(--leaf-200)}
+.rd-amenity-icon{font-size:17px;flex-shrink:0}
+
+/* Gallery */
+.rd-gallery{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.rd-gallery-item{
+  aspect-ratio:1;border-radius:12px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .3s var(--ease);cursor:pointer;
+}
+.rd-gallery-item:hover{transform:scale(1.03)}
+
+/* Reviews in room detail */
+.rd-reviews{display:flex;flex-direction:column;gap:20px}
+.rd-review{
+  padding:22px;background:var(--warm-white);border-radius:var(--radius-md);
+  border:1px solid var(--bark-100);
+}
+
+/* Booking sidebar card */
+.room-sidebar-col{position:sticky;top:100px;align-self:start}
+.rd-booking-card{
+  background:white;border-radius:var(--radius-lg);
+  padding:28px;border:1px solid var(--bark-100);
+  box-shadow:var(--shadow-md);margin-bottom:20px;
+}
+.rdb-price{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+.rdb-price-num{
+  font-family:var(--ff-display);font-size:36px;font-weight:400;color:var(--bark-800);
+}
+.rdb-price-sub{font-size:13px;color:var(--bark-400)}
+.rdb-inc{
+  font-size:11px;color:var(--leaf-600);margin-bottom:16px;
+  font-weight:400;line-height:1.5;
+}
+.rdb-divider{height:1px;background:var(--bark-100);margin:16px 0}
+.rdb-details{display:flex;flex-direction:column;gap:9px}
+.rdb-row{display:flex;justify-content:space-between;align-items:center}
+.rdb-label{font-size:12px;color:var(--bark-400);font-family:var(--ff-mono)}
+.rdb-val{font-size:13px;color:var(--bark-800);font-weight:400}
+
+/* Other rooms */
+.rd-other-rooms{
+  background:var(--warm-white);border-radius:var(--radius-md);
+  padding:20px;border:1px solid var(--bark-100);
+}
+.rd-other-room{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--bark-100);
+  transition:opacity .2s;
+}
+.rd-other-room:last-child{border-bottom:none}
+.rd-other-room:hover{opacity:.75}
+.rd-or-swatch{
+  width:38px;height:38px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.rd-or-name{font-size:13px;font-weight:500;color:var(--bark-800)}
+.rd-or-price{font-size:11px;color:var(--bark-400);font-family:var(--ff-mono);margin-top:2px}
+
+@media(max-width:1100px){
+  .room-hero{grid-template-columns:1fr}
+  .rh-photo{min-height:260px}
+  .rh-content{padding:32px 24px}
+  .room-body-layout{grid-template-columns:1fr;padding:32px 20px 52px}
+  .room-sidebar-col{position:static}
+  .rd-amenities{grid-template-columns:1fr 1fr}
+  .rd-gallery{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .rd-amenities{grid-template-columns:1fr}
+  .rd-gallery{grid-template-columns:1fr 1fr}
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Read-only availability calendar for room detail page
+const ROOM_BOOKED = {{ booked | tojson }};
+const MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+const DAY_SHORT   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+let avY, avM;
+
+function todayA() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+
+function initAvailCal() {
+  const t = todayA();
+  avY = t.getFullYear(); avM = t.getMonth();
+  renderAvailCal();
+}
+
+function shiftAvailMonth(dir) {
+  avM += dir;
+  if (avM > 11) { avM = 0; avY++; }
+  if (avM < 0)  { avM = 11; avY--; }
+  renderAvailCal();
+}
+window.shiftAvailMonth = shiftAvailMonth;
+
+function renderAvailCal() {
+  const titleEl = document.getElementById('avail-cal-title');
+  const gridEl  = document.getElementById('avail-cal-grid');
+  if (!titleEl || !gridEl) return;
+
+  titleEl.textContent = MONTH_NAMES[avM] + ' ' + avY;
+  gridEl.innerHTML = '';
+
+  DAY_SHORT.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dname'; el.textContent = d;
+    gridEl.appendChild(el);
+  });
+
+  const firstDow = new Date(avY, avM, 1).getDay();
+  const daysInMo = new Date(avY, avM + 1, 0).getDate();
+  const t = todayA();
+
+  for (let i = 0; i < firstDow; i++) {
+    const el = document.createElement('div'); el.className = 'cal-day mt';
+    gridEl.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMo; d++) {
+    const dt  = new Date(avY, avM, d);
+    const iso = dt.toISOString().slice(0, 10);
+    const el  = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+
+    if (dt < t) {
+      el.classList.add('dis');
+    } else if (ROOM_BOOKED.includes(iso)) {
+      el.classList.add('bk');
+    } else {
+      // Available — show subtle green dot
+      el.style.color = 'var(--leaf-600)';
+      el.style.cursor = 'default';
+    }
+
+    if (dt.getTime() === t.getTime()) el.classList.add('today');
+    gridEl.appendChild(el);
+  }
+}
+
+initAvailCal();
+</script>
+{% endblock %}

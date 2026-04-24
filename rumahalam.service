@@ -1,0 +1,44 @@
+# ════════════════════════════════════════════════════════
+# Systemd Service — Rumah Alam Homestay
+#
+# Setup:
+#   sudo cp deploy/rumahalam.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable rumahalam
+#   sudo systemctl start rumahalam
+#   sudo systemctl status rumahalam
+#
+# Logs:
+#   sudo journalctl -u rumahalam -f
+# ════════════════════════════════════════════════════════
+
+[Unit]
+Description=Rumah Alam Homestay — FastAPI Application
+After=network.target
+Wants=network.target
+
+[Service]
+Type=exec
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/rumahalam
+Environment="PATH=/var/www/rumahalam/venv/bin"
+EnvironmentFile=/var/www/rumahalam/.env
+ExecStart=/var/www/rumahalam/venv/bin/gunicorn \
+    main:app \
+    --workers 4 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 127.0.0.1:8000 \
+    --timeout 60 \
+    --keepalive 5 \
+    --log-level info \
+    --access-logfile /var/log/rumahalam/access.log \
+    --error-logfile /var/log/rumahalam/error.log
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+KillMode=mixed
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target

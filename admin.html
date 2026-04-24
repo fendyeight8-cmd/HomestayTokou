@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestay Tokou — Management Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #F4F1EA;
+            --warm-white: #FCFBF8;
+            --deep-brown: #3E2723;
+            --mid-brown: #5D4037;
+            --gold: #D49A3E;
+            --sage: #4E6E52;
+            --border: rgba(62, 39, 35, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--deep-brown);
+            min-height: 100vh;
+        }
+
+        /* ── UTILS ── */
+        .btn-primary { background: var(--sage); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-primary:hover { background: var(--deep-brown); }
+        .btn-gold { background: var(--gold); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+        /* ── LOGIN OVERLAY ── */
+        #login-overlay {
+            position: fixed; inset: 0; background: var(--deep-brown); z-index: 1000;
+            display: flex; align-items: center; justify-content: center; padding: 2rem;
+        }
+        .login-card {
+            background: var(--cream); width: 100%; max-width: 400px; padding: 3rem;
+            border-radius: 16px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); text-align: center;
+        }
+        .login-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 2rem; }
+
+        /* ── ADMIN LAYOUT ── */
+        .admin-container { display: none; min-height: 100vh; }
+        .sidebar {
+            width: 280px; background: var(--deep-brown); color: var(--cream); padding: 2.5rem;
+            display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10;
+        }
+        .sidebar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 3rem; color: var(--cream); text-decoration: none; }
+        .sidebar-nav { list-style: none; flex-grow: 1; }
+        .sidebar-nav li { margin-bottom: 1.5rem; }
+        .sidebar-nav a { color: rgba(244, 241, 234, 0.6); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 1rem; cursor: pointer; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { color: var(--gold); }
+
+        .main-content { margin-left: 280px; padding: 4rem; }
+
+        /* ── SECTIONS ── */
+        .section-box { background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 3rem; display: none; }
+        .section-box.active { display: block; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .section-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; }
+
+        /* ── DASHBOARD STATS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: var(--warm-white); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
+        .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); margin-bottom: 0.5rem; display: block; }
+        .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; }
+
+        /* ── TABLES ── */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1.2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-brown); border-bottom: 2px solid var(--cream); }
+        td { padding: 1.2rem; border-bottom: 1px solid var(--cream); font-size: 0.9rem; }
+        .edit-input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; }
+        .room-thumb { width: 60px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(62, 39, 35, 0.8); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem;
+        }
+        .modal-content {
+            background: var(--cream); width: 100%; max-width: 600px; border-radius: 20px;
+            padding: 3rem; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+        }
+        .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--mid-brown); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 0.8rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; background: white; font-family: inherit;
+        }
+
+        .qr-preview { width: 150px; height: 150px; border: 1px solid var(--border); margin-top: 1rem; object-fit: contain; background: white; }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Tokou Management Login</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" style="width: 100%" onclick="Admin.login()">Enter Suite</button>
+            <p id="login-error" style="color: #c0392b; font-size: 0.8rem; margin-top: 1rem; display: none;">Invalid credentials. (Hint: admin / admin123)</p>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="admin-container" id="admin-container">
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo">Homestay Tokou<span>.</span></a>
+            <ul class="sidebar-nav">
+                <li><a onclick="Admin.showSection('overview')" id="nav-overview" class="active">Business Overview</a></li>
+                <li><a onclick="Admin.showSection('inventory')" id="nav-inventory">Room Inventory</a></li>
+                <li><a onclick="Admin.showSection('reviews')" id="nav-reviews">Guest Reviews</a></li>
+                <li><a onclick="Admin.showSection('settings')" id="nav-settings">Site Settings</a></li>
+            </ul>
+            <ul class="sidebar-nav" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(244,241,234,0.1)">
+                <li><a onclick="Admin.logout()" style="color: #e74c3c">Safe Logout</a></li>
+                <li><a href="/" style="opacity: 0.5">View Website</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- OVERVIEW -->
+            <section id="section-overview" class="section-box active">
+                <div class="section-header"><h2>Business Overview</h2></div>
+                <div class="stats-grid">
+                    <div class="stat-card"><span class="stat-label">Total Sales</span><div class="stat-value" id="stat-revenue">RM 0.00</div></div>
+                    <div class="stat-card"><span class="stat-label">Reservations</span><div class="stat-value" id="stat-bookings">0</div></div>
+                    <div class="stat-card"><span class="stat-label">Total Rooms</span><div class="stat-value" id="stat-rooms">0</div></div>
+                    <div class="stat-card"><span class="stat-label">Guest Rating</span><div class="stat-value" id="stat-rating">0.0</div></div>
+                </div>
+                <h3>Recent Activity</h3>
+                <table style="margin-top: 1.5rem">
+                    <thead><tr><th>Guest Name</th><th>Room</th><th>Stay Dates</th><th>Revenue</th><th>Status</th></tr></thead>
+                    <tbody id="recent-bookings-table"></tbody>
+                </table>
+            </section>
+
+            <!-- INVENTORY -->
+            <section id="section-inventory" class="section-box">
+                <div class="section-header">
+                    <h2>Room Inventory</h2>
+                    <button class="btn-primary" onclick="Admin.openAddRoomModal()">+ Add New Room</button>
+                </div>
+                <table>
+                    <thead><tr><th style="width: 80px">Photo</th><th>Room Name</th><th>Category</th><th>Price (RM)</th><th>Cap.</th><th style="text-align: right">Action</th></tr></thead>
+                    <tbody id="inventory-table"></tbody>
+                </table>
+            </section>
+
+            <!-- REVIEWS -->
+            <section id="section-reviews" class="section-box">
+                <div class="section-header"><h2>Guest Reviews</h2></div>
+                <table id="reviews-table"></table>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="section-settings" class="section-box">
+                <div class="section-header"><h2>Site Settings</h2></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Business WhatsApp</label>
+                        <input type="text" id="set-whatsapp" placeholder="+60123456789">
+                        <button class="btn-gold" style="margin-top: 1rem" onclick="Admin.saveSetting('whatsapp')">Save Number</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment QR Code</label>
+                        <div style="position: relative; overflow: hidden; display: inline-block;">
+                            <button class="btn-primary">Upload New QR</button>
+                            <input type="file" onchange="Admin.handleFileUpload('qr', 0, this)" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%">
+                        </div>
+                        <br><img id="qr-preview" class="qr-preview" src="">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ADD ROOM MODAL -->
+    <div class="modal-overlay" id="add-room-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="Admin.closeAddRoomModal()">✕</button>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem">Add New Luxury Suite</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>Room Name</label><input type="text" id="new-room-name" placeholder="E.g. Royal Suite"></div>
+                <div class="form-group"><label>Category</label><select id="new-room-type"><option>Standard</option><option>Deluxe</option><option>Suite</option><option>Family</option></select></div>
+                <div class="form-group"><label>Price per Night (RM)</label><input type="number" id="new-room-price" value="150"></div>
+                <div class="form-group"><label>Max Guests</label><input type="number" id="new-room-cap" value="2"></div>
+            </div>
+            <div class="form-group"><label>Suite Description</label><textarea id="new-room-desc" rows="3" placeholder="Briefly describe the unique features..."></textarea></div>
+            <button class="btn-primary" style="width: 100%; margin-top: 1rem" onclick="Admin.submitNewRoom()">Initialize Room & Add to Inventory</button>
+        </div>
+    </div>
+
+    <script>
+        const Admin = {
+            token: localStorage.getItem('admin_token'),
+
+            init() {
+                if (window.location.protocol === 'file:') alert('Please use http://localhost:8080/admin');
+                if (this.token) {
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('admin-container').style.display = 'block';
+                    this.refreshAll();
+                }
+            },
+
+            async refreshAll() {
+                await Promise.all([this.loadDashboard(), this.loadRooms(), this.loadReviews(), this.loadSettings()]);
+            },
+
+            async login() {
+                const u = document.getElementById('username').value.trim();
+                const p = document.getElementById('password').value.trim();
+                const res = await fetch('/api/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.success) { localStorage.setItem('admin_token', data.token); location.reload(); }
+                else document.getElementById('login-error').style.display = 'block';
+            },
+
+            logout() { localStorage.removeItem('admin_token'); location.reload(); },
+
+            async loadDashboard() {
+                const res = await fetch('/api/dashboard');
+                const data = await res.json();
+                document.getElementById('stat-revenue').textContent = `RM ${data.total_revenue.toFixed(2)}`;
+                document.getElementById('stat-bookings').textContent = data.total_bookings;
+                document.getElementById('stat-rooms').textContent = data.total_rooms;
+                document.getElementById('stat-rating').textContent = data.avg_rating;
+                document.getElementById('recent-bookings-table').innerHTML = data.recent_bookings.map(b => `
+                    <tr><td><b>${b.guest_name}</b></td><td>${b.room_name}</td><td>${b.check_in} — ${b.check_out}</td><td>RM ${b.total_price.toFixed(2)}</td><td><span style="color:var(--sage)">Confirmed</span></td></tr>
+                `).join('');
+            },
+
+            async loadRooms() {
+                const res = await fetch('/api/rooms');
+                const rooms = await res.json();
+                document.getElementById('inventory-table').innerHTML = rooms.map(r => {
+                    const img = r.image_url?.startsWith('uploads') ? r.image_url : `/images/${r.image_url || 'default-room.jpg'}`;
+                    return `
+                    <tr>
+                        <td>
+                            <div style="position:relative; width:60px; height:40px; overflow:hidden; border-radius:4px">
+                                <img src="${img}" class="room-thumb" onerror="this.src='/images/default-room.jpg'">
+                                <input type="file" onchange="Admin.handleFileUpload('room', ${r.id}, this)" style="position:absolute; inset:0; opacity:0; cursor:pointer">
+                            </div>
+                        </td>
+                        <td><input type="text" value="${r.name}" class="edit-input" id="name-${r.id}"></td>
+                        <td><input type="text" value="${r.type}" class="edit-input" id="type-${r.id}"></td>
+                        <td><input type="number" value="${r.price}" class="edit-input" id="price-${r.id}"></td>
+                        <td><input type="number" value="${r.capacity}" class="edit-input" style="width:50px" id="cap-${r.id}"></td>
+                        <td style="text-align:right"><button class="btn-gold" onclick="Admin.saveRoom(${r.id})">Save</button></td>
+                    </tr>`;
+                }).join('');
+            },
+
+            async saveRoom(id) {
+                const p = {
+                    name: document.getElementById(`name-${id}`).value,
+                    type: document.getElementById(`type-${id}`).value,
+                    price: parseFloat(document.getElementById(`price-${id}`).value),
+                    capacity: parseInt(document.getElementById(`cap-${id}`).value)
+                };
+                await fetch(`/api/rooms/update/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
+                alert('Changes committed.');
+                this.loadRooms();
+            },
+
+            async handleFileUpload(type, id, input) {
+                if (!input.files[0]) return;
+                const fd = new FormData();
+                fd.append('file', input.files[0]);
+                const res = await fetch('/api/upload', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                    if (type === 'qr') {
+                        await fetch('/api/settings/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'qr_code', value: data.path }) });
+                    } else {
+                        await fetch(`/api/rooms/update/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_url: data.path }) });
+                    }
+                    alert('Visual Asset Updated.');
+                    this.refreshAll();
+                }
+            },
+
+            async loadReviews() {
+                const res = await fetch('/api/reviews');
+                const data = await res.json();
+                document.getElementById('reviews-table').innerHTML = `
+                    <thead><tr><th>Guest</th><th>Stars</th><th>Comment</th><th>Date</th></tr></thead>
+                    <tbody>${data.reviews.map(r => `<tr><td><b>${r.guest_name}</b></td><td>${'★'.repeat(r.rating)}</td><td style="font-style:italic">"${r.comment}"</td><td>${new Date(r.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody>`;
+            },
+
+            async loadSettings() {
+                const res = await fetch('/api/settings');
+                const s = await res.json();
+                document.getElementById('set-whatsapp').value = s.whatsapp || '';
+                document.getElementById('qr-preview').src = s.qr_code || '';
+            },
+
+            async saveSetting(k) {
+                const v = document.getElementById('set-whatsapp').value;
+                await fetch('/api/settings/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: k, value: v }) });
+                alert('Setting Synchronized.');
+            },
+
+            openAddRoomModal() { document.getElementById('add-room-modal').style.display = 'flex'; },
+            closeAddRoomModal() { document.getElementById('add-room-modal').style.display = 'none'; },
+
+            async submitNewRoom() {
+                const payload = {
+                    name: document.getElementById('new-room-name').value,
+                    type: document.getElementById('new-room-type').value,
+                    price: parseFloat(document.getElementById('new-room-price').value),
+                    capacity: parseInt(document.getElementById('new-room-cap').value),
+                    description: document.getElementById('new-room-desc').value,
+                    amenities: "WiFi, Air Conditioning",
+                    image_url: "default-room.jpg"
+                };
+                if (!payload.name) return alert('Room name is required.');
+                await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                this.closeAddRoomModal();
+                this.loadRooms();
+                alert('New Suite Initialized.');
+            },
+
+            showSection(id) {
+                document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
+                document.getElementById(`section-${id}`).classList.add('active');
+                document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+                document.getElementById(`nav-${id}`).classList.add('active');
+            }
+        };
+        Admin.init();
+    </script>
+</body>
+</html>
