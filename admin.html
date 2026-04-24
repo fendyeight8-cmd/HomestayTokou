@@ -228,16 +228,12 @@
         
         /* Edit State Toggles */
         .room-card .edit-ui { display: none; }
-        .room-card.is-editing .read-ui { display: none; }
-        .room-card.is-editing .edit-ui { display: block; }
-        .room-card.is-editing { border: 2px solid var(--sage); }
-        .room-card.is-editing .room-card-actions { background: white; }
         
-        .inline-edit-input { width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        .inline-edit-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--mid-brown); margin-bottom: 0.2rem; display: block; }
+        .inline-edit-input { width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid var(--border); border-radius: 6px; font-family: inherit; margin-bottom: 0.5rem; font-size: 0.95rem; background: white; outline: none; }
+        .inline-edit-input:focus { border-color: var(--sage); }
+        .inline-edit-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--mid-brown); margin-bottom: 0.3rem; display: block; }
         
-        .img-upload-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; opacity: 0; transition: 0.2s; cursor: pointer; }
-        .room-card.is-editing .room-card-img-container:hover .img-upload-overlay { opacity: 1; }
+        .img-upload-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; opacity: 0; transition: 0.2s; cursor: pointer; }
         
         @media (max-width: 1024px) {
             .sidebar { width: 80px; padding: 2rem 1rem; }
@@ -453,7 +449,7 @@
                         <p>Manage room photos, pricing, capacity, category, and availability.</p>
                     </div>
                     <div class="dash-actions">
-                        <button class="btn-primary" onclick="Admin.openAddRoomModal()"><i class="fa-solid fa-plus"></i> Add New Room</button>
+                        <button class="btn-primary" onclick="Admin.openRoomModal()"><i class="fa-solid fa-plus"></i> Add New Room</button>
                         <a href="/" target="_blank" class="btn-primary" style="background:var(--mid-brown); border-color:var(--mid-brown); text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-eye"></i> View Website</a>
                     </div>
                 </div>
@@ -583,64 +579,68 @@
         </main>
     </div>
 
-    <!-- ADD ROOM MODAL -->
-    <div class="modal-overlay" id="add-room-modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <button class="modal-close" onclick="Admin.closeAddRoomModal()">✕</button>
-            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--deep-brown); margin-bottom: 0.5rem;">Add New Room</h2>
-            <p style="color: var(--mid-brown); margin-bottom: 2rem;">Fill in the details below to add a new room to your inventory.</p>
+    <!-- ROOM MODAL -->
+    <div class="modal-overlay" id="room-modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <button class="modal-close" onclick="Admin.closeRoomModal()">✕</button>
+            <h2 id="modal-title" style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--deep-brown); margin-bottom: 0.5rem;">Add New Room</h2>
+            <p id="modal-subtitle" style="color: var(--mid-brown); margin-bottom: 2rem;">Update room details, pricing, capacity, status, and image.</p>
             
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
-                <!-- Image Upload Column -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Image Upload -->
                 <div>
-                    <label class="inline-edit-label">Room Photo</label>
-                    <div style="position:relative; width:100%; aspect-ratio:4/3; background:var(--cream); border-radius:12px; border:2px dashed var(--border); overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;" onclick="document.getElementById('new-room-image').click()">
-                        <img id="new-room-image-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; position:absolute; inset:0;">
+                    <label class="inline-edit-label" style="font-size: 0.8rem;">Room Photo</label>
+                    <div style="position:relative; width:100%; height:220px; background:var(--cream); border-radius:12px; border:2px dashed var(--border); overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;" onclick="document.getElementById('modal-room-image').click()">
+                        <img id="modal-room-image-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none; position:absolute; inset:0;">
                         <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem; color:var(--mid-brown); margin-bottom:0.5rem; position:relative; z-index:1;"></i>
                         <span style="font-size:0.8rem; color:var(--mid-brown); position:relative; z-index:1;">Click to upload (Max 5MB)</span>
-                        <input type="file" id="new-room-image" accept="image/jpeg, image/png, image/webp" style="display:none" onchange="Admin.previewNewRoomImage(this)">
+                        
+                        <!-- Change Photo Overlay Button -->
+                        <div id="modal-change-photo-btn" style="display:none; position:absolute; bottom:10px; right:10px; background:rgba(255,255,255,0.9); padding:0.4rem 0.8rem; border-radius:4px; font-size:0.8rem; font-weight:bold; color:var(--deep-brown); z-index:2; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                            <i class="fa-solid fa-camera"></i> Change Photo
+                        </div>
+                        
+                        <input type="file" id="modal-room-image" accept="image/jpeg, image/png, image/webp" style="display:none" onchange="Admin.previewRoomImage(this)">
                     </div>
                 </div>
 
-                <!-- Form Details Column -->
-                <div>
-                    <div class="form-grid" style="margin-top: 0; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>Room Name</label>
-                            <input type="text" id="new-room-name" placeholder="E.g. Royal Suite">
-                        </div>
-                        <div class="form-group">
-                            <label>Category</label>
-                            <select id="new-room-type">
-                                <option>Standard</option>
-                                <option>Deluxe</option>
-                                <option>Suite</option>
-                                <option>Family</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select id="new-room-status">
-                                <option value="Active">Active</option>
-                                <option value="Maintenance">Maintenance</option>
-                                <option value="Hidden">Hidden</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Price per Night (RM)</label>
-                            <input type="number" id="new-room-price" value="150">
-                        </div>
-                        <div class="form-group">
-                            <label>Max Guests</label>
-                            <input type="number" id="new-room-cap" value="2">
-                        </div>
+                <!-- Form Details -->
+                <div class="form-grid" style="margin-top: 0; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Room Name</label>
+                        <input type="text" id="modal-room-name" placeholder="E.g. Royal Suite">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="modal-room-type">
+                            <option value="Standard">Standard</option>
+                            <option value="Deluxe">Deluxe</option>
+                            <option value="Suite">Suite</option>
+                            <option value="Family">Family</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="modal-room-status">
+                            <option value="Active">Active</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Hidden">Hidden</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price per Night (RM)</label>
+                        <input type="number" id="modal-room-price" value="150">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Guests</label>
+                        <input type="number" id="modal-room-cap" value="2">
                     </div>
                 </div>
             </div>
             
             <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border);">
-                <button class="btn-primary" style="background:transparent; color:var(--mid-brown); border:1px solid var(--border);" onclick="Admin.closeAddRoomModal()">Cancel</button>
-                <button class="btn-gold" id="btn-submit-room" onclick="Admin.submitNewRoom()">Save Room to Inventory</button>
+                <button class="btn-primary" style="background:transparent; color:var(--mid-brown); border:1px solid var(--border);" onclick="Admin.closeRoomModal()">Cancel</button>
+                <button class="btn-gold" id="btn-submit-room" onclick="Admin.submitRoom()">Create Room</button>
             </div>
         </div>
     </div>
@@ -969,64 +969,25 @@
                     <div class="room-card" id="room-card-${r.id}">
                         <div class="room-card-img-container">
                             <img src="${img}" class="room-card-img" onerror="this.src='/images/default-room.jpg'">
-                            <div class="img-upload-overlay" onclick="document.getElementById('upload-${r.id}').click()">
-                                <i class="fa-solid fa-camera"></i> Change Photo
-                            </div>
-                            <input type="file" id="upload-${r.id}" onchange="Admin.handleFileUpload('room', ${r.id}, this)" style="display:none">
                         </div>
                         
                         <div class="room-card-body">
                             <div class="room-card-header">
-                                <h3 class="room-card-title read-ui">${r.name}</h3>
-                                <div class="edit-ui" style="flex-grow:1; margin-right:1rem;">
-                                    <label class="inline-edit-label">Room Name</label>
-                                    <input type="text" class="inline-edit-input" id="edit-name-${r.id}" value="${r.name}">
-                                </div>
-                                <span class="badge ${badgeClass} read-ui">${rStatus}</span>
-                                <div class="edit-ui">
-                                    <label class="inline-edit-label">Status</label>
-                                    <select class="inline-edit-input" id="edit-status-${r.id}">
-                                        <option value="Active" ${rStatus==='Active'?'selected':''}>Active</option>
-                                        <option value="Maintenance" ${rStatus==='Maintenance'?'selected':''}>Maintenance</option>
-                                        <option value="Hidden" ${rStatus==='Hidden'?'selected':''}>Hidden</option>
-                                    </select>
-                                </div>
+                                <h3 class="room-card-title">${r.name}</h3>
+                                <span class="badge ${badgeClass}">${rStatus}</span>
                             </div>
-                            
-                            <div class="room-card-meta read-ui">
+                            <div class="room-card-meta">
                                 <span><i class="fa-solid fa-layer-group"></i> ${r.type}</span>
                                 <span><i class="fa-solid fa-user-group"></i> ${r.capacity} Guests</span>
-                            </div>
-                            
-                            <div class="edit-ui" style="display:none; flex-wrap:wrap; gap:1rem; margin-top:0.5rem;">
-                                <div style="flex:1;">
-                                    <label class="inline-edit-label">Category</label>
-                                    <select class="inline-edit-input" id="edit-type-${r.id}">
-                                        <option value="Standard" ${r.type==='Standard'?'selected':''}>Standard</option>
-                                        <option value="Deluxe" ${r.type==='Deluxe'?'selected':''}>Deluxe</option>
-                                        <option value="Suite" ${r.type==='Suite'?'selected':''}>Suite</option>
-                                        <option value="Family" ${r.type==='Family'?'selected':''}>Family</option>
-                                    </select>
-                                </div>
-                                <div style="flex:1;">
-                                    <label class="inline-edit-label">Price (RM)</label>
-                                    <input type="number" class="inline-edit-input" id="edit-price-${r.id}" value="${r.price}">
-                                </div>
-                                <div style="flex:1;">
-                                    <label class="inline-edit-label">Capacity</label>
-                                    <input type="number" class="inline-edit-input" id="edit-cap-${r.id}" value="${r.capacity}">
-                                </div>
                             </div>
                         </div>
                         
                         <div class="room-card-actions">
-                            <div class="room-price-display read-ui">RM ${r.price}</div>
-                            <span class="read-ui" style="font-size:0.8rem; color:var(--mid-brown);">per night</span>
-                            
-                            <button class="btn-primary read-ui" style="width:100%; margin-top:auto;" onclick="Admin.toggleRoomEdit(${r.id})"><i class="fa-solid fa-pen"></i> Edit Room</button>
-                            
-                            <button class="btn-gold edit-ui" style="width:100%; display:none; margin-top:auto;" onclick="Admin.saveRoom(${r.id})"><i class="fa-solid fa-check"></i> Save Changes</button>
-                            <button class="btn-primary edit-ui" style="width:100%; display:none; background:transparent; color:var(--mid-brown); border:1px solid var(--border);" onclick="Admin.toggleRoomEdit(${r.id})">Cancel</button>
+                            <div style="text-align:right; width:100%;">
+                                <div class="room-price-display">RM ${r.price}</div>
+                                <span style="font-size:0.8rem; color:var(--mid-brown);">per night</span>
+                            </div>
+                            <button class="btn-primary" style="width:100%; margin-top:auto;" onclick="Admin.openRoomModal(${r.id})"><i class="fa-solid fa-pen"></i> Edit Room</button>
                         </div>
                     </div>`;
                 }).join('');
@@ -1104,38 +1065,72 @@
                 alert('Setting Synchronized.');
             },
 
-            openAddRoomModal() { 
-                document.getElementById('add-room-modal').style.display = 'flex'; 
-                // Reset fields
-                document.getElementById('new-room-name').value = '';
-                document.getElementById('new-room-price').value = '150';
-                document.getElementById('new-room-cap').value = '2';
-                document.getElementById('new-room-image').value = '';
-                document.getElementById('new-room-image-preview').style.display = 'none';
-                document.getElementById('new-room-image-preview').src = '';
+            editingRoomId: null,
+
+            openRoomModal(id = null) { 
+                this.editingRoomId = id;
+                document.getElementById('room-modal').style.display = 'flex'; 
                 
+                const title = document.getElementById('modal-title');
                 const btn = document.getElementById('btn-submit-room');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = 'Save Room to Inventory';
+                const btnPhoto = document.getElementById('modal-change-photo-btn');
+                const preview = document.getElementById('modal-room-image-preview');
+                
+                // Reset common state
+                btn.disabled = false;
+                document.getElementById('modal-room-image').value = '';
+
+                if (id) {
+                    // Edit Mode
+                    const room = this.currentRooms.find(r => r.id === id);
+                    if (room) {
+                        title.textContent = 'Edit Room';
+                        btn.innerHTML = 'Save Changes';
+                        
+                        document.getElementById('modal-room-name').value = room.name;
+                        document.getElementById('modal-room-type').value = room.type;
+                        document.getElementById('modal-room-price').value = room.price;
+                        document.getElementById('modal-room-cap').value = room.capacity;
+                        document.getElementById('modal-room-status').value = room.status || 'Active';
+                        
+                        const img = room.image_url?.startsWith('uploads') ? room.image_url : `/images/${room.image_url || 'default-room.jpg'}`;
+                        preview.src = img;
+                        preview.style.display = 'block';
+                        btnPhoto.style.display = 'block';
+                    }
+                } else {
+                    // Add Mode
+                    title.textContent = 'Add New Room';
+                    btn.innerHTML = 'Create Room';
+                    
+                    document.getElementById('modal-room-name').value = '';
+                    document.getElementById('modal-room-type').value = 'Standard';
+                    document.getElementById('modal-room-price').value = '150';
+                    document.getElementById('modal-room-cap').value = '2';
+                    document.getElementById('modal-room-status').value = 'Active';
+                    
+                    preview.style.display = 'none';
+                    preview.src = '';
+                    btnPhoto.style.display = 'none';
                 }
             },
-            closeAddRoomModal() { document.getElementById('add-room-modal').style.display = 'none'; },
+            closeRoomModal() { document.getElementById('room-modal').style.display = 'none'; this.editingRoomId = null; },
 
-            previewNewRoomImage(input) {
+            previewRoomImage(input) {
                 if (input.files && input.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        const preview = document.getElementById('new-room-image-preview');
+                        const preview = document.getElementById('modal-room-image-preview');
                         preview.src = e.target.result;
                         preview.style.display = 'block';
+                        document.getElementById('modal-change-photo-btn').style.display = 'block';
                     }
                     reader.readAsDataURL(input.files[0]);
                 }
             },
 
-            async submitNewRoom() {
-                const nameInput = document.getElementById('new-room-name').value;
+            async submitRoom() {
+                const nameInput = document.getElementById('modal-room-name').value;
                 if (!nameInput) return alert('Room name is required.');
 
                 const btn = document.getElementById('btn-submit-room');
@@ -1144,11 +1139,11 @@
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
                 }
 
-                let finalImageUrl = "default-room.jpg";
-                const imageInput = document.getElementById('new-room-image');
+                let finalImageUrl = null; // null means don't change if editing
+                const imageInput = document.getElementById('modal-room-image');
 
                 try {
-                    // Upload image first if one was selected
+                    // Upload image first if a new one was selected
                     if (imageInput.files && imageInput.files[0]) {
                         const fd = new FormData();
                         fd.append('file', imageInput.files[0]);
@@ -1157,33 +1152,48 @@
                         if (uploadData.success) {
                             finalImageUrl = uploadData.path;
                         } else {
-                            alert('Image upload failed, using default placeholder.');
+                            alert('Image upload failed. Proceeding without new image.');
                         }
                     }
 
-                    // Submit final room payload
                     const payload = {
                         name: nameInput,
-                        type: document.getElementById('new-room-type').value,
-                        price: parseFloat(document.getElementById('new-room-price').value),
-                        capacity: parseInt(document.getElementById('new-room-cap').value),
-                        status: document.getElementById('new-room-status').value,
-                        description: "Premium hotel suite", // Fallback for backend constraints
-                        amenities: "WiFi, Air Conditioning",
-                        image_url: finalImageUrl
+                        type: document.getElementById('modal-room-type').value,
+                        price: parseFloat(document.getElementById('modal-room-price').value),
+                        capacity: parseInt(document.getElementById('modal-room-cap').value),
+                        status: document.getElementById('modal-room-status').value
                     };
 
-                    await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    this.closeAddRoomModal();
+                    if (this.editingRoomId) {
+                        // UPDATE
+                        if (finalImageUrl) payload.image_url = finalImageUrl;
+                        
+                        // Update basic details (backend only updates basic details on this route, except image which might need separate call if backend isn't ready. Wait, the backend doesn't handle image_url in /update/ except if it's the ONLY field. Let's make sure backend updates image_url or we update it in a separate call)
+                        await fetch(`/api/rooms/update/${this.editingRoomId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        
+                        // If backend requires separate call for image:
+                        if (finalImageUrl) {
+                            await fetch(`/api/rooms/update/${this.editingRoomId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_url: finalImageUrl }) });
+                        }
+                        alert('Room changes saved.');
+                    } else {
+                        // CREATE
+                        payload.description = "Premium hotel suite";
+                        payload.amenities = "WiFi, Air Conditioning";
+                        payload.image_url = finalImageUrl || "default-room.jpg";
+                        await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        alert('New suite successfully added.');
+                    }
+
+                    this.closeRoomModal();
                     await this.loadRooms();
-                    alert('New suite successfully added to inventory.');
                 } catch (e) {
-                    console.error("Error creating room:", e);
-                    alert("An error occurred while creating the room.");
+                    console.error("Error saving room:", e);
+                    alert("An error occurred while saving the room.");
                 } finally {
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = 'Save Room to Inventory';
+                        btn.innerHTML = this.editingRoomId ? 'Save Changes' : 'Create Room';
                     }
                 }
             },
